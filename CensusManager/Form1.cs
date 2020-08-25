@@ -425,20 +425,7 @@ namespace CensusManager
             if (currentBuild != null)
             {
                 string address = currentVillage.name + currentBuild.number;
-                //string a = "鲁权屯镇闫庄村 001号";
-                //string b = "鲁权屯镇闫庄村001号";
-                currentPersonList = allPersonList.Where(model => model.address.Equals("鲁权屯镇闫庄村001号")).ToList();
-
-
-                //if(currentPersonList!=null)
-                //currentPersonList.Clear();
-                //foreach(var p in allPersonList)
-                //{
-                //    if (p.address.Contains("鲁权屯镇闫庄村001号"))
-                //    {
-                //        currentPersonList.Add(p);
-                //    }
-                //}
+                currentPersonList = allPersonList.Where(model => model.address.Equals(address)).ToList();
                 foreach (var b in currentPersonList)
                 {
                     int index = this.dataGridViewPerson.Rows.Add();
@@ -520,7 +507,7 @@ namespace CensusManager
             //string html = HttpHelper.PostHttpByJson(uri, json);
             //MessageBox.Show(html);
 
-
+            if (!allowClick) return;
             string mid = (this.listBoxBuild.SelectedItem as Build).mid;
             string hkwtJson = "{\"hkwt_sg\":\"\",\"hkwt_zy\":\"\",\"hkwt_fwcs\":\"\"}";
             string person = "[{ \"xm\":\"苏振红\",\"gmsfhm\":\"372424196809183530\",\"ysbrgx\":\"01\",\"rkbm\":\"\"'},{ \"xm\":\"张国英\",\"gmsfhm\":\"372424196602183541\",\"ysbrgx\":\"\",\"rkbm\":\"\"}]";
@@ -558,9 +545,19 @@ namespace CensusManager
             Process.Start("https://msjw.gat.shandong.gov.cn/zayw/hkzd/stbb/rysb.jsp?guid=" + currentVillage.guid);
         }
 
+        private bool allowClick = false;
         private void label3_Click(object sender, EventArgs e)
         {
-            http();
+            allowClick = !allowClick;
+            if (allowClick)
+            {
+                label3.BackColor = Color.Red;
+            }
+            else
+            {
+                label3.BackColor = Color.Transparent;
+            }
+            //http();
             //MessageBox.Show(HttpHelper.PostHttpByJson("https://localhost:44342/Home/Json", "{'Name':'wangsc','Age':'18'}"));
             //MessageBox.Show(HttpHelper.PostHttpByJson("https://localhost:44342/Users/Create", "{'Name':'wangsc','Age':'18'}"));
 
