@@ -47,10 +47,6 @@ namespace CensusManager
 
 
         string[] dragFiles;
-        private void Form1_DragDrop(object sender, DragEventArgs e)
-        {
-        }
-
         /**
          * 解析出村庄GUID
          */
@@ -79,8 +75,8 @@ namespace CensusManager
                 int newCount = 0, redo = 0;
                 for (int i = 0; i < guidCollection.Count; i++)
                 {
-                    string guid = guidCollection[i].Value;
-                    string name = nameCollection[i].Value;
+                    string guid = guidCollection[i].Value.Trim();
+                    string name = nameCollection[i].Value.Trim();
                     if (allVillageList.FirstOrDefault(model => model.guid.Equals(guid)) == null)
                     {
                         newCount++;
@@ -138,11 +134,11 @@ namespace CensusManager
                     int currentRowIndex = 0;
                     while (currentRowIndex < length)
                     {
-                        string no = sheet.Rows[currentRowIndex][0].ToString();
-                        string ralation = sheet.Rows[currentRowIndex][1].ToString();
-                        string name = sheet.Rows[currentRowIndex][2].ToString();
-                        string id = sheet.Rows[currentRowIndex][3].ToString();
-                        string address = sheet.Rows[currentRowIndex][4].ToString();
+                        string no = sheet.Rows[currentRowIndex][0].ToString().Trim();
+                        string ralation = sheet.Rows[currentRowIndex][1].ToString().Trim();
+                        string name = sheet.Rows[currentRowIndex][2].ToString().Trim();
+                        string id = sheet.Rows[currentRowIndex][3].ToString().Trim();
+                        string address = sheet.Rows[currentRowIndex][4].ToString().Trim();
 
                         currentRowIndex++;
                         if (no.Trim().Length != 9 || id.Trim().Length != 18)
@@ -210,9 +206,9 @@ namespace CensusManager
 
                     for (int i = 0; i < guidCollection.Count; i++)
                     {
-                        string guid = guidCollection[i].Value;
-                        string mid = midCollection[i].Value;
-                        string number = numberCollection[i].Value;
+                        string guid = guidCollection[i].Value.Trim();
+                        string mid = midCollection[i].Value.Trim();
+                        string number = numberCollection[i].Value.Trim();
                         if (allBuildList.FirstOrDefault(model => model.guid.Equals(guid)) == null)
                         {
                             newCount++;
@@ -306,10 +302,6 @@ namespace CensusManager
                 if (saveFile != null)
                     saveFile.Close();
             }
-        }
-
-        private void Form1_DragEnter(object sender, DragEventArgs e)
-        {
         }
 
         private void listBoxBuild_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -432,7 +424,21 @@ namespace CensusManager
 
             if (currentBuild != null)
             {
-                currentPersonList = allPersonList.Where(model => model.address.Equals(currentVillage.name + currentBuild.number)).ToList();
+                string address = currentVillage.name + currentBuild.number;
+                //string a = "鲁权屯镇闫庄村 001号";
+                //string b = "鲁权屯镇闫庄村001号";
+                currentPersonList = allPersonList.Where(model => model.address.Equals("鲁权屯镇闫庄村001号")).ToList();
+
+
+                //if(currentPersonList!=null)
+                //currentPersonList.Clear();
+                //foreach(var p in allPersonList)
+                //{
+                //    if (p.address.Contains("鲁权屯镇闫庄村001号"))
+                //    {
+                //        currentPersonList.Add(p);
+                //    }
+                //}
                 foreach (var b in currentPersonList)
                 {
                     int index = this.dataGridViewPerson.Rows.Add();
@@ -451,14 +457,6 @@ namespace CensusManager
                     }
                 }
             }
-        }
-
-        private void listBoxPerson_DragDrop(object sender, DragEventArgs e)
-        {
-        }
-
-        private void listBoxPerson_DragEnter(object sender, DragEventArgs e)
-        {
         }
 
         private void listBoxBuild_DragDrop(object sender, DragEventArgs e)
@@ -500,14 +498,6 @@ namespace CensusManager
             }
         }
 
-        private void listViewPerson_DragDrop(object sender, DragEventArgs e)
-        {
-        }
-
-        private void listViewPerson_DragEnter(object sender, DragEventArgs e)
-        {
-        }
-
         private void dataGridViewPerson_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             var cell = this.dataGridViewPerson.SelectedCells;
@@ -531,14 +521,14 @@ namespace CensusManager
             //MessageBox.Show(html);
 
 
-            //string mid = (this.listBoxBuild.SelectedItem as Build).mid;
-            //string hkwtJson = "{\"hkwt_sg\":\"\",\"hkwt_zy\":\"\",\"hkwt_fwcs\":\"\"}";
-            //string person = "[{ \"xm\":\"苏振红\",\"gmsfhm\":\"372424196809183530\",\"ysbrgx\":\"01\",\"rkbm\":\"\"'},{ \"xm\":\"张国英\",\"gmsfhm\":\"372424196602183541\",\"ysbrgx\":\"\",\"rkbm\":\"\"}]";
-            //string json = "{ \"ryxx\":\"" + person + "\",\"mid\":\"" + mid + "\",\"wt\":\"" + hkwtJson + "\" }";
-            //string uri = "https://msjw.gat.shandong.gov.cn/zayw/hkzd/stbb/jnryxx_save.jsp";
-            //string html = HttpHelper.PostHttpByJson(uri, json);
-            //File.WriteAllText("d:\\abc.txt", html);
-            //MessageBox.Show("访问结束");
+            string mid = (this.listBoxBuild.SelectedItem as Build).mid;
+            string hkwtJson = "{\"hkwt_sg\":\"\",\"hkwt_zy\":\"\",\"hkwt_fwcs\":\"\"}";
+            string person = "[{ \"xm\":\"苏振红\",\"gmsfhm\":\"372424196809183530\",\"ysbrgx\":\"01\",\"rkbm\":\"\"'},{ \"xm\":\"张国英\",\"gmsfhm\":\"372424196602183541\",\"ysbrgx\":\"\",\"rkbm\":\"\"}]";
+            string json = "{ \"ryxx\":\"" + person + "\",\"mid\":\"" + mid + "\",\"wt\":\"" + hkwtJson + "\" }";
+            string uri = "https://msjw.gat.shandong.gov.cn/zayw/hkzd/stbb/jnryxx_save.jsp";
+            string html = HttpHelper.PostHttpByJson(uri, json);
+            File.WriteAllText("d:\\abc.txt", html);
+            MessageBox.Show("访问结束");
         }
 
         private void dataGridViewPerson_DragDrop(object sender, DragEventArgs e)
