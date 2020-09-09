@@ -1,4 +1,6 @@
-﻿namespace CensusManager
+﻿using Microsoft.Toolkit.Forms.UI.Controls;
+
+namespace CensusManager
 {
     partial class Form1
     {
@@ -44,7 +46,11 @@
             this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.web = new Microsoft.Toolkit.Forms.UI.Controls.WebView();
+            this.buttonLoad = new System.Windows.Forms.Button();
+            this.buttonSubmit = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewPerson)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.web)).BeginInit();
             this.SuspendLayout();
             // 
             // listBoxVillage
@@ -57,7 +63,7 @@
             this.listBoxVillage.ItemHeight = 27;
             this.listBoxVillage.Location = new System.Drawing.Point(12, 48);
             this.listBoxVillage.Name = "listBoxVillage";
-            this.listBoxVillage.Size = new System.Drawing.Size(169, 571);
+            this.listBoxVillage.Size = new System.Drawing.Size(169, 787);
             this.listBoxVillage.TabIndex = 2;
             this.listBoxVillage.SelectedIndexChanged += new System.EventHandler(this.listBoxVillage_SelectedIndexChanged);
             this.listBoxVillage.DragDrop += new System.Windows.Forms.DragEventHandler(this.listBoxVillage_DragDrop);
@@ -74,7 +80,7 @@
             this.listBoxBuild.ItemHeight = 27;
             this.listBoxBuild.Location = new System.Drawing.Point(187, 48);
             this.listBoxBuild.Name = "listBoxBuild";
-            this.listBoxBuild.Size = new System.Drawing.Size(150, 571);
+            this.listBoxBuild.Size = new System.Drawing.Size(104, 787);
             this.listBoxBuild.TabIndex = 2;
             this.listBoxBuild.SelectedIndexChanged += new System.EventHandler(this.listBoxBuild_SelectedIndexChanged);
             this.listBoxBuild.DragDrop += new System.Windows.Forms.DragEventHandler(this.listBoxBuild_DragDrop);
@@ -100,6 +106,7 @@
             this.label2.Size = new System.Drawing.Size(50, 26);
             this.label2.TabIndex = 3;
             this.label2.Text = "房屋";
+            this.label2.Click += new System.EventHandler(this.label房屋_Click);
             // 
             // label3
             // 
@@ -110,16 +117,15 @@
             this.label3.Size = new System.Drawing.Size(50, 26);
             this.label3.TabIndex = 3;
             this.label3.Text = "住户";
-            this.label3.Click += new System.EventHandler(this.label3_Click);
+            this.label3.Click += new System.EventHandler(this.label住户_Click);
             // 
             // dataGridViewPerson
             // 
             this.dataGridViewPerson.AllowDrop = true;
             this.dataGridViewPerson.AllowUserToAddRows = false;
             this.dataGridViewPerson.AllowUserToDeleteRows = false;
-            this.dataGridViewPerson.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataGridViewPerson.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
             dataGridViewCellStyle1.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
@@ -134,10 +140,11 @@
             this.Column2,
             this.Column3,
             this.Column4});
-            this.dataGridViewPerson.Location = new System.Drawing.Point(343, 48);
+            this.dataGridViewPerson.Location = new System.Drawing.Point(297, 48);
             this.dataGridViewPerson.MultiSelect = false;
             this.dataGridViewPerson.Name = "dataGridViewPerson";
             this.dataGridViewPerson.ReadOnly = true;
+            this.dataGridViewPerson.RowHeadersVisible = false;
             dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle6.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             dataGridViewCellStyle6.Padding = new System.Windows.Forms.Padding(3);
@@ -145,7 +152,7 @@
             this.dataGridViewPerson.RowTemplate.Height = 30;
             this.dataGridViewPerson.RowTemplate.ReadOnly = true;
             this.dataGridViewPerson.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.dataGridViewPerson.Size = new System.Drawing.Size(802, 571);
+            this.dataGridViewPerson.Size = new System.Drawing.Size(688, 787);
             this.dataGridViewPerson.TabIndex = 5;
             this.dataGridViewPerson.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewPerson_CellClick);
             this.dataGridViewPerson.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridViewPerson_CellMouseDoubleClick);
@@ -175,7 +182,7 @@
             this.Column3.HeaderText = "身份证";
             this.Column3.Name = "Column3";
             this.Column3.ReadOnly = true;
-            this.Column3.Width = 260;
+            this.Column3.Width = 235;
             // 
             // Column4
             // 
@@ -184,14 +191,49 @@
             this.Column4.HeaderText = "地址";
             this.Column4.Name = "Column4";
             this.Column4.ReadOnly = true;
-            this.Column4.Width = 300;
+            this.Column4.Width = 250;
+            // 
+            // web
+            // 
+            this.web.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.web.Location = new System.Drawing.Point(991, 48);
+            this.web.MinimumSize = new System.Drawing.Size(20, 20);
+            this.web.Name = "web";
+            this.web.Size = new System.Drawing.Size(481, 787);
+            this.web.TabIndex = 6;
+            this.web.DOMContentLoaded += new System.EventHandler<Microsoft.Toolkit.Win32.UI.Controls.Interop.WinRT.WebViewControlDOMContentLoadedEventArgs>(this.web_DOMContentLoadedAsync);
+            // 
+            // buttonLoad
+            // 
+            this.buttonLoad.Font = new System.Drawing.Font("华文中宋", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.buttonLoad.Location = new System.Drawing.Point(459, 239);
+            this.buttonLoad.Name = "buttonLoad";
+            this.buttonLoad.Size = new System.Drawing.Size(125, 33);
+            this.buttonLoad.TabIndex = 7;
+            this.buttonLoad.Text = "提交";
+            this.buttonLoad.UseVisualStyleBackColor = true;
+            this.buttonLoad.Click += new System.EventHandler(this.buttonLoad_Click);
+            // 
+            // buttonSubmit
+            // 
+            this.buttonSubmit.Font = new System.Drawing.Font("华文中宋", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.buttonSubmit.Location = new System.Drawing.Point(459, 239);
+            this.buttonSubmit.Name = "buttonSubmit";
+            this.buttonSubmit.Size = new System.Drawing.Size(125, 33);
+            this.buttonSubmit.TabIndex = 7;
+            this.buttonSubmit.Text = "提交";
+            this.buttonSubmit.UseVisualStyleBackColor = true;
+            this.buttonSubmit.Click += new System.EventHandler(this.buttonSubmit_Click);
             // 
             // Form1
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1157, 635);
+            this.ClientSize = new System.Drawing.Size(1484, 861);
+            this.Controls.Add(this.web);
             this.Controls.Add(this.dataGridViewPerson);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -199,9 +241,11 @@
             this.Controls.Add(this.listBoxBuild);
             this.Controls.Add(this.listBoxVillage);
             this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "户籍管理";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewPerson)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.web)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -215,10 +259,13 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.DataGridView dataGridViewPerson;
+        private WebView web;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column3;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column4;
+        private System.Windows.Forms.Button buttonLoad;
+        private System.Windows.Forms.Button buttonSubmit;
     }
 }
 

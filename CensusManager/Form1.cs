@@ -14,6 +14,9 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using 人口普查;
+using SHDocVw;
+using mshtml;
+using System.Runtime.ConstrainedExecution;
 
 namespace CensusManager
 {
@@ -28,6 +31,8 @@ namespace CensusManager
         private string villageDataPath = "village.dat";
         private string buildDataPath = "build.dat";
         private string personDataPath = "person.dat";
+        private string url = "";
+        private int step = 0;
 
 
         private delegate void FormControlInvoker();
@@ -44,7 +49,6 @@ namespace CensusManager
             //string a = "https://msjw.gat.shandong.gov.cn/zayw/hkzd/stbb/zzsb.jsp?data=pVC3T2lZmIc4jlXXaJyILe5mZPxaaeqx9L43ge5lIGEZynQ860PsjuB9O9RTeDRDDd7uGjeiovBVYWXnFq7eP9BbvWenwLF4GtiXgcdDRyjwT42sYSdvrIEumJkdNvmzWajK9tYQDXfa7nbpvKwtQ11FBaTHxyEVYr1c1mefBapa9FyqcyMhKVGfcbYd%2BL5v58KJHHTREyHElKceWNCgQUd7IhmaglLkaiTu2Awqjq0%3D";
             //Process.Start(a);
         }
-
 
         string[] dragFiles;
         /**
@@ -192,7 +196,7 @@ namespace CensusManager
 
                     if (guidCollection.Count != numberCollection.Count || guidCollection.Count != midCollection.Count || midCollection.Count != numberCollection.Count)
                     {
-                        MessageBox.Show("【" + fileName + "】的房屋数据不平衡，请联系管理员。GUID："+guidCollection.Count+"，MID："+midCollection.Count+"，NUMBER："+numberCollection.Count);
+                        MessageBox.Show("【" + fileName + "】的房屋数据不平衡，请联系管理员。GUID：" + guidCollection.Count + "，MID：" + midCollection.Count + "，NUMBER：" + numberCollection.Count);
                         throw new Exception("【" + fileName + "】的房屋数据不平衡。");
                     }
 
@@ -307,22 +311,57 @@ namespace CensusManager
         private void listBoxBuild_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             var currentBuild = this.listBoxBuild.SelectedItem as Build;
-            //var currentVillage = this.listBoxVillage.SelectedItem as Village;
-            //this.listViewPerson.Items.Clear();
-            System.Diagnostics.Process.Start("https://msjw.gat.shandong.gov.cn/zayw/hkzd/stbb/rysb.jsp?guid=" + currentBuild.guid);
+            url = "https://msjw.gat.shandong.gov.cn/zayw/hkzd/stbb/rysb.jsp?guid=" + currentBuild.guid;
+            Process.Start(url);
+            //Process.Start("iexplore.exe", url);
 
-            //if (currentBuild != null)
-            //{
-            //    var allPersonList = getPersonList();
-            //    currentPersonList = allPersonList.Where(model => model.address.Equals(currentVillage.name + currentBuild.number)).ToList();
-            //    foreach (var b in currentPersonList)
-            //    {
-            //        this.listViewPerson.Items.Add(b.race);
-            //        this.listViewPerson.Items.Add(b.name);
-            //        this.listViewPerson.Items.Add(b.id);
-            //        this.listViewPerson.Items.Add(b.address);
-            //    }
-            //}
+        }
+        private void label房屋_Click(object sender, EventArgs e)
+        {
+            //web.InvokeScriptAsync("getTHR");
+            //ccc();
+        }
+
+        private void web_DOMContentLoadedAsync(object sender, Microsoft.Toolkit.Win32.UI.Controls.Interop.WinRT.WebViewControlDOMContentLoadedEventArgs e)
+        {
+            new Thread(new ThreadStart(() =>
+            {
+                web.InvokeScriptAsync("fun01");
+            })).Start();
+        }
+
+        private void label住户_Click(object sender, EventArgs e)
+        {
+            allowClick = !allowClick;
+            if (allowClick)
+            {
+                label3.BackColor = Color.Red;
+            }
+            else
+            {
+                label3.BackColor = Color.Transparent;
+            }
+            //http();
+            //MessageBox.Show(HttpHelper.PostHttpByJson("https://localhost:44342/Home/Json", "{'Name':'wangsc','Age':'18'}"));
+            //MessageBox.Show(HttpHelper.PostHttpByJson("https://localhost:44342/Users/Create", "{'Name':'wangsc','Age':'18'}"));
+
+
+            /**
+             * ajax获取户籍信息
+             */
+            //string json = "{'pid':371428198412174015,'name':王世起}";
+            //string uri = "https://msjw.gat.shandong.gov.cn/zayw/hkzd/stbb/cxthr.jsp";
+            //string html = HttpHelper.PostHttpByJson(uri, json);
+
+        }
+
+
+        private void listBoxVillage_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            var currentVillage = this.listBoxVillage.SelectedItem as Village;
+            string url = "https://msjw.gat.shandong.gov.cn/zayw/hkzd/stbb/rysb.jsp?guid=" + currentVillage.guid;
+            Process.Start(url);
+            //Process.Start("iexplore.exe", url);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -331,6 +370,8 @@ namespace CensusManager
             {
                 this.listBoxVillage.Items.Add(v);
             }
+            url = "https://msjw.gat.shandong.gov.cn/zayw/hkzd/stbb/rysb.jsp";
+            web.Navigate(url);
         }
 
         private void listBoxVillage_SelectedIndexChanged(object sender, EventArgs e)
@@ -418,14 +459,48 @@ namespace CensusManager
 
         private void listBoxBuild_SelectedIndexChanged(object sender, EventArgs e)
         {
+            step = 0;
             var currentBuild = this.listBoxBuild.SelectedItem as Build;
             var currentVillage = this.listBoxVillage.SelectedItem as Village;
             this.dataGridViewPerson.Rows.Clear();
+            url = "https://msjw.gat.shandong.gov.cn/zayw/hkzd/stbb/rysb.jsp?guid=" + currentBuild.guid;
 
             if (currentBuild != null)
             {
                 string address = currentVillage.name + currentBuild.number;
                 currentPersonList = allPersonList.Where(model => model.address.Equals(address)).ToList();
+
+
+                StringBuilder fun02 = new StringBuilder();
+                fun02.Append("function fun02() {");
+                fun02.Append("  $('.xshcyxx').remove();");
+                fun02.Append("  $('.hjcyList').remove();");
+                fun02.Append("  $('#hkwt_whcd').val('');");
+                fun02.Append("  $('#hkwt_whcd').attr('code', '');");
+                fun02.Append("  $('#hkwt_byzk').val('');");
+                fun02.Append("  $('#hkwt_byzk').attr('code', '');");
+                fun02.Append("  $('#hkwt_hyzk').val('');");
+                fun02.Append("  $('#hkwt_hyzk').attr('code', '');");
+                fun02.Append("  $('#hkwt_xx').val('');");
+                fun02.Append("  $('#hkwt_xx').attr('code', '');");
+                fun02.Append("  $('#hkwt_sg').val('');");
+                fun02.Append("  $('#hkwt_zy').val('');");
+                fun02.Append("  $('#hkwt_fwcs').val('');");
+                fun02.Append("}");
+
+                StringBuilder fun01 = new StringBuilder();
+                fun01.Append("function fun01() {");
+                fun01.Append("$('#mySwitch2').removeClass('mui-active');");
+                fun01.Append("$('.mui-switch-handle').attr('style', 'transition-duration: 0.2s; transform: translate(0px, 0px);');");
+
+                fun01.Append("$('#pid').attr('readonly', false);");
+                fun01.Append("$('#name').attr('readonly', false);");
+
+
+
+
+                int i = 0;
+                int hz = 0;
                 foreach (var b in currentPersonList)
                 {
                     int index = this.dataGridViewPerson.Rows.Add();
@@ -433,16 +508,48 @@ namespace CensusManager
                     this.dataGridViewPerson.Rows[index].Cells[1].Value = b.name;
                     this.dataGridViewPerson.Rows[index].Cells[2].Value = b.id;
                     this.dataGridViewPerson.Rows[index].Cells[3].Value = b.address;
-                    if (b.relation.Equals("户主"))
+                    if (b.relation.Equals("户主") && hz == 0)
                     {
+                        hz++;
                         DataGridViewCellStyle cs = new DataGridViewCellStyle();
                         cs.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
                         this.dataGridViewPerson.Rows[index].Cells[0].Style = cs;
                         this.dataGridViewPerson.Rows[index].Cells[1].Style = cs;
                         this.dataGridViewPerson.Rows[index].Cells[2].Style = cs;
                         this.dataGridViewPerson.Rows[index].Cells[3].Style = cs;
+
+                        fun01.Append($"$('#pid').val('{b.id}');");
+                        fun01.Append($"$('#name').val('{b.name}');");
+                        //builder.Append($"$('#info').trigger('blur');");
+                    }
+                    else
+                    {
+                        //builder.Append("if($('.addBox').size()>0) return;");
+                        fun01.Append("$('.tianjia').trigger('tap');");
+                        fun01.Append($" $('.addBox').eq({i}).find('.tzrPid').first().val('{b.id}');");
+                        fun01.Append($" $('.addBox').eq({i}).find('.tzrName').first().val('{b.name}');");
+                        i++;
                     }
                 }
+                //builder.Append("$('#mySwitch2').trigger('toggle');");
+                //builder.Append("getTHR();");
+                fun01.Append("}");
+                web.AddInitializeScript(fun01.ToString());
+                web.AddInitializeScript(fun02.ToString());
+                web.Navigate(url);
+
+                System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+                dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+                dataGridViewCellStyle1.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+                dataGridViewCellStyle1.BackColor = Color.Black;
+                dataGridViewCellStyle1.ForeColor = Color.White;
+                int index1 = this.dataGridViewPerson.Rows.Add();
+                this.dataGridViewPerson.Rows[index1].Cells[0].Value = "";
+                this.dataGridViewPerson.Rows[index1].Cells[1].Value = "";
+                this.dataGridViewPerson.Rows[index1].Cells[2].Value = "同步";
+                this.dataGridViewPerson.Rows[index1].Cells[2].Style = dataGridViewCellStyle1;
+                this.dataGridViewPerson.Rows[index1].Cells[3].Value = "提交";
+                this.dataGridViewPerson.Rows[index1].Cells[3].Style = dataGridViewCellStyle1;
             }
         }
 
@@ -487,15 +594,49 @@ namespace CensusManager
 
         private void dataGridViewPerson_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            var cell = this.dataGridViewPerson.SelectedCells;
-            string value = cell[0].Value.ToString();
-            Clipboard.SetText(value);
+            try
+            {
+                if (e.RowIndex == this.dataGridViewPerson.Rows.Count - 1)
+                {
+                    switch (e.ColumnIndex)
+                    {
+                        case 2:
+                            new Thread(new ThreadStart(() =>
+                            {
+                                step = 1;
+                                web.InvokeScriptAsync("fun02");
+                                web.InvokeScriptAsync("getTHR");
+                            })).Start();
+                            break;
+                        case 3:
+                            if (step < 1)
+                            {
+                                MessageBox.Show("先进行同步。");
+                                break;
+                            }
+                            new Thread(new ThreadStart(() =>
+                            {
+                                web.InvokeScriptAsync("doSubmits");
+                            })).Start();
+                            break;
+                    }
+                }
+                //else
+                //{
+                //    var cell = this.dataGridViewPerson.SelectedCells;
+                //    string value = cell[0].Value.ToString();
+                //    Clipboard.SetText(value);
 
-            DataGridViewCellStyle cs1 = dataGridViewPerson[e.ColumnIndex, e.RowIndex].Style;
-            DataGridViewCellStyle cs = new DataGridViewCellStyle();
-            cs.Font = cs1.Font;
-            cs.ForeColor = Color.FromArgb(192, 0, 0);
-            dataGridViewPerson[e.ColumnIndex, e.RowIndex].Style = cs;
+                //    DataGridViewCellStyle cs1 = dataGridViewPerson[e.ColumnIndex, e.RowIndex].Style;
+                //    DataGridViewCellStyle cs = new DataGridViewCellStyle();
+                //    cs.Font = cs1.Font;
+                //    cs.ForeColor = Color.FromArgb(192, 0, 0);
+                //    dataGridViewPerson[e.ColumnIndex, e.RowIndex].Style = cs;
+                //}
+            }
+            catch (Exception)
+            {
+            }
         }
 
         private void dataGridViewPerson_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -539,37 +680,64 @@ namespace CensusManager
             }
         }
 
-        private void listBoxVillage_MouseDoubleClick(object sender, MouseEventArgs e)
-        {
-            var currentVillage = this.listBoxVillage.SelectedItem as Village;
-            Process.Start("https://msjw.gat.shandong.gov.cn/zayw/hkzd/stbb/rysb.jsp?guid=" + currentVillage.guid);
-        }
 
         private bool allowClick = false;
-        private void label3_Click(object sender, EventArgs e)
+
+        private void aaa()
         {
-            allowClick = !allowClick;
-            if (allowClick)
+
+            SHDocVw.ShellWindows shellWindows = new SHDocVw.ShellWindowsClass();
+            //遍历所有选项卡
+            foreach (SHDocVw.InternetExplorer Browser in shellWindows)
             {
-                label3.BackColor = Color.Red;
+                if (Browser.LocationURL.Contains("www.baidu.com"))
+                {
+                    IHTMLDocument2 doc2 = (IHTMLDocument2)Browser.Document;
+                    IHTMLElementCollection inputs = (IHTMLElementCollection)doc2.all.tags("INPUT");
+                    HTMLInputElement input1 = (HTMLInputElement)inputs.item("kw", 0);
+                    input1.value = "刘德华";
+                    IHTMLElement element2 = (IHTMLElement)inputs.item("su", 0);
+                    element2.click();
+                }
             }
-            else
-            {
-                label3.BackColor = Color.Transparent;
-            }
-            //http();
-            //MessageBox.Show(HttpHelper.PostHttpByJson("https://localhost:44342/Home/Json", "{'Name':'wangsc','Age':'18'}"));
-            //MessageBox.Show(HttpHelper.PostHttpByJson("https://localhost:44342/Users/Create", "{'Name':'wangsc','Age':'18'}"));
-
-
-            /**
-             * ajax获取户籍信息
-             */
-            //string json = "{'pid':371428198412174015,'name':王世起}";
-            //string uri = "https://msjw.gat.shandong.gov.cn/zayw/hkzd/stbb/cxthr.jsp";
-            //string html = HttpHelper.PostHttpByJson(uri, json);
-
         }
+
+        private void buttonSubmit_Click(object sender, EventArgs e)
+        {
+            new Thread(new ThreadStart(() =>
+            {
+                web.InvokeScriptAsync("doSubmits");
+            })).Start();
+        }
+
+        private void buttonLoad_Click(object sender, EventArgs e)
+        {
+            new Thread(new ThreadStart(() =>
+            {
+                web.InvokeScriptAsync("getTHR");
+            })).Start();
+        }
+
+        private void ccc()
+        {
+            SHDocVw.ShellWindows shellWindows = new SHDocVw.ShellWindowsClass();
+            //遍历所有选项卡
+            foreach (SHDocVw.InternetExplorer Browser in shellWindows)
+            {
+                if (Browser.LocationURL.Contains(url))
+                {
+                    IHTMLDocument2 doc2 = (IHTMLDocument2)Browser.Document;
+                    IHTMLElementCollection divs = (IHTMLElementCollection)doc2.all.tags("input");
+                    HTMLInputElement aa = (HTMLInputElement)divs.item("pid", 0);
+                    aa.value = "1234567890";
+                    //aa.click();
+                    HTMLInputElement bb = (HTMLInputElement)divs.item("name", 0);
+                    bb.value = "ddd";
+                    //bb.click();
+                }
+            }
+        }
+
         private void http()
         {
 
@@ -588,9 +756,9 @@ namespace CensusManager
             //wt json格式：{ "hkwt_whcd":"20","hkwt_hyzk":"20","hkwt_sg":"","hkwt_zy":"","hkwt_fwcs":""}
 
 
-           /**
-            * 登录山东微警务
-            */
+            /**
+             * 登录山东微警务
+             */
             //string json = "{\"loginname\": \"18509513143\", \"password\": \"wjw123321\", \"code\": \"\", \"formerurl\": \"https://msjw.gat.shandong.gov.cn/wechat/html/juzhuzhengnew.html?v=2.0\", \"webtype\": \"\" }";
             ////string json = "loginname=18509513143&assword=wjw123321&code=''&formerurl=https://msjw.gat.shandong.gov.cn/wechat/html/juzhuzhengnew.html?v=2.0&webtype=''";
             //string url = "https://msjw.gat.shandong.gov.cn//wechatservice/wxlogin/login";
