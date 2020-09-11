@@ -30,7 +30,7 @@ namespace CensusManager
         private List<Village> currentVillageList;
         private List<Build> currentBuildList;
         private List<Person> currentPersonList;
-        public Form1()   
+        public Form1()
         {
             //string abc = "dzyslx= \"'>  d+ \" </ div > \"";
             //Regex reg = new Regex("(?<=dzyslx=.*>).{1,10}(?=</div>)");
@@ -62,15 +62,15 @@ namespace CensusManager
                     {
                         int length = sheet.Rows.Count;
 
-                    /**
-                     * 第0列：户号。第1列：关系。第2列：名字。第3列：身份证号。第4列：住址。
-                     */
+                        /**
+                         * 第0列：户号。第1列：关系。第2列：名字。第3列：身份证号。第4列：住址。
+                         */
                         int currentRowIndex = 0;
                         while (currentRowIndex < length)
                         {
                             this.Invoke(new FormControlInvoker(() =>
                             {
-                                statusLabel.Text = dragFile+"，"+currentRowIndex+"行";
+                                statusLabel.Text = dragFile + "，" + currentRowIndex + "行";
                             }));
                             string no = sheet.Rows[currentRowIndex][0].ToString().Trim();
                             string ralation = sheet.Rows[currentRowIndex][1].ToString().Trim();
@@ -96,7 +96,7 @@ namespace CensusManager
                         }
                     });
                 }
-                MessageBox.Show("导入新数据 " + newCount + " 条，重复数据 " + redo + " 条，不合格数据 " + illegal + " 条");
+                MessageBox.Show("新数据 " + newCount + " 条，重复数据 " + redo + " 条，不合格数据 " + illegal + " 条");
             }
             catch (Exception)
             {
@@ -258,7 +258,7 @@ namespace CensusManager
         private void parseVillage()
         {
             StreamReader reader = null;
-            //List<MoveFile> moveFiles = new List<MoveFile>();
+            List<MoveFile> moveFiles = new List<MoveFile>();
             try
             {
                 int newVillageCount = 0, newBuildCount = 0, oldVillageCount = 0, oldBuildCount = 0, fileCount = 0;
@@ -274,20 +274,21 @@ namespace CensusManager
                     }));
                     reader = File.OpenText(dragFile);
                     string content = reader.ReadToEnd();
-                    Regex reg = new Regex("[0-9A-Za-z]{8}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{12}");
+                    Regex reg = new Regex("(?<=guid=)[0-9A-Za-z]{8}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{12}");
+                    var villageGuidCollection = reg.Matches(content);
+                    reg = new Regex("(?<=guid=\")[0-9A-Za-z]{8}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{12}");
                     var guidCollection = reg.Matches(content);
-                    reg = new Regex("(?<=dzyslx=[^>]*>)[^<]{1,10}(?=</div>)");
-                    //reg = new Regex("(?<=dzyslx=.*>)[^</div>]{1,10}(?=</div>)");
+                    reg = new Regex("(?<=dzyslx=[^>]{1,10}>)[^<]{0,10}");
                     var numberCollection = reg.Matches(content);
                     reg = new Regex("(?<=mid=\")[0-9]{21}");
                     var midCollection = reg.Matches(content);
                     reg = new Regex("(?<=<span>)[\u4E00-\u9FA5]+(?=</span>)");
-                    var nameCollection = reg.Matches(content);
+                    var villageNameCollection = reg.Matches(content);
 
                     string fileNameEx = Path.GetFileName(dragFile), fileName = Path.GetFileNameWithoutExtension(dragFile);
-                    if (!(numberCollection.Count == midCollection.Count && guidCollection.Count - 1 == midCollection.Count))
+                    if (!(numberCollection.Count == midCollection.Count&& midCollection.Count == guidCollection.Count&&villageGuidCollection.Count==1&&villageNameCollection.Count==1))
                     {
-                        MessageBox.Show($"file : {fileName} ;guid count : {guidCollection.Count}; number count : {numberCollection.Count} ;mid count : {midCollection.Count} . ");
+                        MessageBox.Show($"file : {fileName};village guid count : {villageGuidCollection.Count} ;village name count : {villageNameCollection.Count} ;guid count : {guidCollection.Count}; number count : {numberCollection.Count} ;mid count : {midCollection.Count} . ");
                         throw new Exception("【" + fileName + "】的房屋数据不平衡。");
                     }
 
@@ -297,20 +298,14 @@ namespace CensusManager
                         throw new Exception("【" + fileName + "】不存在数据。");
                     }
 
-                    if (nameCollection.Count == 0)
-                    {
-                        MessageBox.Show($"{dragFile}中不存在村庄名字。");
-                        throw new Exception($"{dragFile}中不存在村庄名字。");
-                    }
-
                     /**
                      * 解析村庄
                      * */
-                    string villageName = nameCollection[0].Value.Trim();
-                    string villageGuid = guidCollection[0].Value.Trim();
+                    string villageName = villageNameCollection[0].Value.Trim();
+                    string villageGuid = villageGuidCollection[0].Value.Trim();
 
                     Village village = CensusContext.GetVillage(villageName);
-                    if (village==null)
+                    if (village == null)
                     {
                         village = new Village(villageGuid, villageName);
                         CensusContext.AddVillage(village);
@@ -321,19 +316,18 @@ namespace CensusManager
                         oldVillageCount++;
                     }
 
-                    //FileInfo fi = new FileInfo(dragFile);
-                    //MoveFile mf = new MoveFile();
-                    //mf.oldPath = dragFile;
-                    //mf.newPath = fi.Directory.FullName + "\\" + villageName.Replace("鲁权屯镇", "") + ".html";
-                    //moveFiles.Add(mf);
-                    //fi.MoveTo(newName); //xx/xx/xx.rar
+                    FileInfo fi = new FileInfo(dragFile);
+                    MoveFile mf = new MoveFile();
+                    mf.oldPath = dragFile;
+                    mf.newPath = fi.Directory.FullName + "\\" + villageName.Replace("鲁权屯镇", "") + ".html";
+                    moveFiles.Add(mf);
 
                     /**
                      * 解析房屋
                      * */
                     for (int i = 0; i < numberCollection.Count; i++)
                     {
-                        string guid = guidCollection[i + 1].Value.Trim();
+                        string guid = guidCollection[i].Value.Trim();
                         string mid = midCollection[i].Value.Trim();
                         string number = numberCollection[i].Value.Trim();
                         if (!CensusContext.IsExistBuild(guid))
@@ -365,7 +359,7 @@ namespace CensusManager
                     }));
                 }
 
-                MessageBox.Show(sb.Append($"共解析{fileCount}个文件，解析出{newVillageCount}个新村庄数据，{oldVillageCount}个已存在的村庄数据，{newBuildCount}个新房屋数据，{oldBuildCount}个已存在的房屋数据。").ToString());
+                MessageBox.Show(sb.Append($"共导入{fileCount}个文件。\r\n{newVillageCount}个村庄新数据，{oldVillageCount}个已存在村庄数据。\r\n{newBuildCount}个房屋新数据，{oldBuildCount}个已存在房屋数据。").ToString());
             }
             catch (Exception e)
             {
@@ -376,11 +370,12 @@ namespace CensusManager
                 if (reader != null)
                     reader.Close();
 
-                //foreach (var f in moveFiles)
-                //{
-                //    FileInfo fi = new FileInfo(f.oldPath);
-                //    fi.MoveTo(f.newPath);
-                //}
+                foreach (var f in moveFiles)
+                {
+                    FileInfo fi = new FileInfo(f.oldPath);
+                    if (!f.oldPath.Equals(f.newPath))
+                        fi.MoveTo(f.newPath);
+                }
                 this.Invoke(new FormControlInvoker(() =>
                 {
                     statusLabel.Text = "";
@@ -478,7 +473,7 @@ namespace CensusManager
 
             if (currentBuild != null)
             {
-                currentPersonList = CensusContext.GetPersons(currentVillage.name, currentBuild.number); 
+                currentPersonList = CensusContext.GetPersons(currentVillage.name, currentBuild.number);
 
 
                 StringBuilder fun02 = new StringBuilder();
@@ -796,9 +791,9 @@ namespace CensusManager
             CensusContext.DisConnect();
         }
     }
-    //class MoveFile
-    //{
-    //    public string oldPath;
-    //    public string newPath;
-    //}
+    class MoveFile
+    {
+        public string oldPath;
+        public string newPath;
+    }
 }
