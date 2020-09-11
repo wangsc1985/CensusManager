@@ -1,4 +1,5 @@
-﻿using CensusManager.model;
+﻿using CensusManager.helper;
+using CensusManager.model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,7 +21,7 @@ namespace CensusManager
         public DataForm()
         {
             InitializeComponent();
-            allVillageList = getVillageList();
+            allVillageList = CensusContext.GetVillages();
         }
 
         private void buttonOk_Click(object sender, EventArgs e)
@@ -81,7 +82,7 @@ namespace CensusManager
             listBox1.Items.Add("张官屯村");
             listBox1.Items.Add("高官屯村");
             listBox1.Items.Add("刘军户村");
-            listBox1.Items.Add("付家楼村"); 
+            listBox1.Items.Add("付家楼村");
             listBox1.Items.Add("付家坊村");
             listBox1.Items.Add("东王屯村");
             listBox1.Items.Add("西王屯村");
@@ -121,28 +122,28 @@ namespace CensusManager
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
 
-            foreach(var aa in allVillageList)
+            foreach (var aa in allVillageList)
             {
                 if (aa.name.Contains(this.listBox1.SelectedItem.ToString()))
                 {
-            StringBuilder fun01 = new StringBuilder();
-            fun01.Append("function fun01() {");
-            fun01.Append("  $('#dsbm').val('371400');");
-            fun01.Append("  $('#qxbm').val('371428');");
-            fun01.Append("  $('#ds').val('德州市');");
-            fun01.Append("  $('#qx').val('武城县');");
-            fun01.Append($"  $('#dzms').val('鲁权屯镇{this.listBox1.SelectedItem.ToString()}');");
-            fun01.Append("  DoSubmit();");
-            fun01.Append("}");
+                    StringBuilder fun01 = new StringBuilder();
+                    fun01.Append("function fun01() {");
+                    fun01.Append("  $('#dsbm').val('371400');");
+                    fun01.Append("  $('#qxbm').val('371428');");
+                    fun01.Append("  $('#ds').val('德州市');");
+                    fun01.Append("  $('#qx').val('武城县');");
+                    fun01.Append($"  $('#dzms').val('鲁权屯镇{this.listBox1.SelectedItem.ToString()}');");
+                    fun01.Append("  DoSubmit();");
+                    fun01.Append("}");
 
-            StringBuilder fun02 = new StringBuilder();
-            fun02.Append("function fun02() {");
-            fun02.Append("   alert($('.dataList').html());");
-            fun02.Append("}");
-            webView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(fun01.ToString());
-            webView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(fun02.ToString());
-            webView.CoreWebView2.Navigate("https://msjw.gat.shandong.gov.cn/zayw/hkzd/stbb/dzcx.jsp");
-            webView.CoreWebView2.NavigationCompleted += CoreWebView2_NavigationCompleted;
+                    StringBuilder fun02 = new StringBuilder();
+                    fun02.Append("function fun02() {");
+                    fun02.Append("   alert($('.dataList').html());");
+                    fun02.Append("}");
+                    webView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(fun01.ToString());
+                    webView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(fun02.ToString());
+                    webView.CoreWebView2.Navigate("https://msjw.gat.shandong.gov.cn/zayw/hkzd/stbb/dzcx.jsp");
+                    webView.CoreWebView2.NavigationCompleted += CoreWebView2_NavigationCompleted;
 
                 }
             }
@@ -153,27 +154,6 @@ namespace CensusManager
         private void button1_Click(object sender, EventArgs e)
         {
             webView.CoreWebView2.ExecuteScriptAsync("fun02();");
-        }
-        private string villageDataPath = "village.dat";
-        private List<Village> getVillageList()
-        {
-            FileStream loadFile = null;
-            try
-            {
-                IFormatter serializer = new BinaryFormatter();
-                loadFile = new FileStream(villageDataPath, FileMode.Open, FileAccess.Read);
-                var villageList = serializer.Deserialize(loadFile) as List<Village>;
-                return villageList;
-            }
-            catch (Exception)
-            {
-                return new List<Village>();
-            }
-            finally
-            {
-                if (loadFile != null)
-                    loadFile.Close();
-            }
         }
     }
 }

@@ -22,20 +22,14 @@ namespace CensusManager
 
     public partial class Form1 : Form
     {
-        //private string villageDataPath = System.Windows.Forms.Application.StartupPath + @"\data\village.dat";
-        //private string buildDataPath = System.Windows.Forms.Application.StartupPath + @"\data\build.dat";
-        //private string personDataPath = System.Windows.Forms.Application.StartupPath + @"\data\person.dat";
-        private string villageDataPath = "village.dat";
-        private string buildDataPath = "build.dat";
-        private string personDataPath = "person.dat";
         private string url = "";
         private int step = 0;
 
 
         private delegate void FormControlInvoker();
-        private List<Village> allVillageList;
-        private List<Build> currentBuildList, allBuildList;
-        private List<Person> currentPersonList, allPersonList;
+        private List<Village> currentVillageList;
+        private List<Build> currentBuildList;
+        private List<Person> currentPersonList;
         public Form1()   
         {
             //string abc = "dzyslx= \"'>  d+ \" </ div > \"";
@@ -43,12 +37,12 @@ namespace CensusManager
             //var numberCollection = reg.Matches(abc);
 
             InitializeComponent();
-            allVillageList = getVillageList();
-            allBuildList = getBuildList();
-            allPersonList = getPersonList();
 
             //string a = "https://msjw.gat.shandong.gov.cn/zayw/hkzd/stbb/zzsb.jsp?data=pVC3T2lZmIc4jlXXaJyILe5mZPxaaeqx9L43ge5lIGEZynQ860PsjuB9O9RTeDRDDd7uGjeiovBVYWXnFq7eP9BbvWenwLF4GtiXgcdDRyjwT42sYSdvrIEumJkdNvmzWajK9tYQDXfa7nbpvKwtQ11FBaTHxyEVYr1c1mefBapa9FyqcyMhKVGfcbYd%2BL5v58KJHHTREyHElKceWNCgQUd7IhmaglLkaiTu2Awqjq0%3D";
             //Process.Start(a);
+
+            CensusContext.Connect();
+            currentVillageList = CensusContext.GetVillages();
         }
 
         string[] dragFiles;
@@ -58,49 +52,62 @@ namespace CensusManager
 
         private void parsePerson()
         {
-            int newCount = 0, redo = 0, illegal = 0;
-
-            foreach (var dragFile in dragFiles)
+            try
             {
-                ExcelHelper.ParseExcel(dragFile, "常住人口", (sheet) =>
-                {
+                int newCount = 0, redo = 0, illegal = 0;
 
-                    int length = sheet.Rows.Count;
+                foreach (var dragFile in dragFiles)
+                {
+                    ExcelHelper.ParseExcel(dragFile, "常住人口", (sheet) =>
+                    {
+                        int length = sheet.Rows.Count;
 
                     /**
                      * 第0列：户号。第1列：关系。第2列：名字。第3列：身份证号。第4列：住址。
                      */
-                    int currentRowIndex = 0;
-                    while (currentRowIndex < length)
-                    {
-                        string no = sheet.Rows[currentRowIndex][0].ToString().Trim();
-                        string ralation = sheet.Rows[currentRowIndex][1].ToString().Trim();
-                        string name = sheet.Rows[currentRowIndex][2].ToString().Trim();
-                        string id = sheet.Rows[currentRowIndex][3].ToString().Trim();
-                        string address = sheet.Rows[currentRowIndex][4].ToString().Trim();
-
-                        currentRowIndex++;
-                        if (no.Trim().Length != 9 || id.Trim().Length != 18)
+                        int currentRowIndex = 0;
+                        while (currentRowIndex < length)
                         {
-                            illegal++;
-                            continue;
-                        }
-                        if (allPersonList.FirstOrDefault(model => model.id.Equals(id)) == null)
-                        {
-                            newCount++;
-                            allPersonList.Add(new Person(ralation, name, id, "汉族", address));
-                        }
-                        else
-                        {
-                            redo++;
-                        }
-                    }
-                    savePerson(allPersonList);
+                            this.Invoke(new FormControlInvoker(() =>
+                            {
+                                statusLabel.Text = dragFile+"，"+currentRowIndex+"行";
+                            }));
+                            string no = sheet.Rows[currentRowIndex][0].ToString().Trim();
+                            string ralation = sheet.Rows[currentRowIndex][1].ToString().Trim();
+                            string name = sheet.Rows[currentRowIndex][2].ToString().Trim();
+                            string id = sheet.Rows[currentRowIndex][3].ToString().Trim();
+                            string address = sheet.Rows[currentRowIndex][4].ToString().Trim();
 
-
-                });
+                            currentRowIndex++;
+                            if (no.Trim().Length != 9 || id.Trim().Length != 18)
+                            {
+                                illegal++;
+                                continue;
+                            }
+                            if (!CensusContext.IsExistPersons(id))
+                            {
+                                newCount++;
+                                CensusContext.AddPerson(new Person(ralation, name, id, "汉族", address));
+                            }
+                            else
+                            {
+                                redo++;
+                            }
+                        }
+                    });
+                }
+                MessageBox.Show("导入新数据 " + newCount + " 条，重复数据 " + redo + " 条，不合格数据 " + illegal + " 条");
             }
-            MessageBox.Show("导入新数据 " + newCount + " 条，重复数据 " + redo + " 条，不合格数据 " + illegal + " 条");
+            catch (Exception)
+            {
+            }
+            finally
+            {
+                this.Invoke(new FormControlInvoker(() =>
+                {
+                    statusLabel.Text = "";
+                }));
+            }
         }
 #if false
         private void parseVillage()
@@ -248,16 +255,14 @@ namespace CensusManager
             //
         }
 #endif
-        private void parseBuild()
+        private void parseVillage()
         {
             StreamReader reader = null;
-            List<MoveFile> moveFiles = new List<MoveFile>();
+            //List<MoveFile> moveFiles = new List<MoveFile>();
             try
             {
                 int newVillageCount = 0, newBuildCount = 0, oldVillageCount = 0, oldBuildCount = 0, fileCount = 0;
                 StringBuilder sb = new StringBuilder();
-                List<Village> villages = new List<Village>();
-                List<Build> builds = new List<Build>();
 
 
                 foreach (var dragFile in dragFiles)
@@ -303,11 +308,11 @@ namespace CensusManager
                     string villageName = nameCollection[0].Value.Trim();
                     string villageGuid = guidCollection[0].Value.Trim();
 
-                    Village village = allVillageList.FirstOrDefault(model => model.name.Equals(villageName));
-                    if (village == null)
+                    Village village = CensusContext.GetVillage(villageName);
+                    if (village==null)
                     {
                         village = new Village(villageGuid, villageName);
-                        villages.Add(village);
+                        CensusContext.AddVillage(village);
                         newVillageCount++;
                     }
                     else
@@ -315,11 +320,11 @@ namespace CensusManager
                         oldVillageCount++;
                     }
 
-                    FileInfo fi = new FileInfo(dragFile);
-                    MoveFile mf = new MoveFile();
-                    mf.oldPath = dragFile;
-                    mf.newPath = fi.Directory.FullName + "\\" + villageName.Replace("鲁权屯镇", "") + ".html";
-                    moveFiles.Add(mf);
+                    //FileInfo fi = new FileInfo(dragFile);
+                    //MoveFile mf = new MoveFile();
+                    //mf.oldPath = dragFile;
+                    //mf.newPath = fi.Directory.FullName + "\\" + villageName.Replace("鲁权屯镇", "") + ".html";
+                    //moveFiles.Add(mf);
                     //fi.MoveTo(newName); //xx/xx/xx.rar
 
                     /**
@@ -332,11 +337,11 @@ namespace CensusManager
                         string number = numberCollection[i].Value.Trim();
                         if (number.Contains("<"))
                             number = "-";
-                        if (allBuildList.FirstOrDefault(model => model.guid.Equals(guid)) == null)
+                        if (!CensusContext.IsExistBuild(guid))
                         {
                             newBuildCount++;
                             //allBuildList.Add(new Build(guid, mid, Regex.Match(number, "[0-9]{1,4}号").Value, village.guid));
-                            allBuildList.Add(new Build(guid, mid, number, village.guid));
+                            CensusContext.AddBuild(new Build(guid, mid, number, village.guid));
                         }
                         else
                         {
@@ -348,16 +353,12 @@ namespace CensusManager
                     //sb.Append(village.name + "导入新数据 " + newCount + " 条，重复数据 " + redo + " 条\n\r");
                     fileCount++;
                 }
-                allVillageList.AddRange(villages);
-                allBuildList.AddRange(builds);
-                saveVillage(allVillageList);
-                saveBuild(allBuildList);
-
+                currentVillageList = CensusContext.GetVillages();
                 this.Invoke(new FormControlInvoker(() =>
                 {
                     listBoxVillage.Items.Clear();
                 }));
-                foreach (var v in allVillageList)
+                foreach (var v in currentVillageList)
                 {
                     this.Invoke(new FormControlInvoker(() =>
                     {
@@ -376,78 +377,17 @@ namespace CensusManager
                 if (reader != null)
                     reader.Close();
 
-                foreach (var f in moveFiles)
-                {
-                    FileInfo fi = new FileInfo(f.oldPath);
-                    fi.MoveTo(f.newPath);
-                }
+                //foreach (var f in moveFiles)
+                //{
+                //    FileInfo fi = new FileInfo(f.oldPath);
+                //    fi.MoveTo(f.newPath);
+                //}
                 this.Invoke(new FormControlInvoker(() =>
                 {
                     statusLabel.Text = "";
                 }));
             }
             //
-        }
-        private void saveVillage(List<Village> data)
-        {
-            FileStream saveFile = null;
-            try
-            {
-                IFormatter serializer = new BinaryFormatter();
-                saveFile = new FileStream(villageDataPath, FileMode.Create, FileAccess.Write);
-                serializer.Serialize(saveFile, data);
-                saveFile.Close();
-            }
-            catch (Exception)
-            {
-
-            }
-            finally
-            {
-                if (saveFile != null)
-                    saveFile.Close();
-            }
-        }
-        private void savePerson(List<Person> data)
-        {
-            FileStream saveFile = null;
-            try
-            {
-                IFormatter serializer = new BinaryFormatter();
-                saveFile = new FileStream(personDataPath, FileMode.Create, FileAccess.Write);
-                serializer.Serialize(saveFile, data);
-                saveFile.Close();
-            }
-            catch (Exception)
-            {
-
-            }
-            finally
-            {
-                if (saveFile != null)
-                    saveFile.Close();
-            }
-        }
-
-        private void saveBuild(List<Build> data)
-        {
-            FileStream saveFile = null;
-            try
-            {
-                IFormatter serializer = new BinaryFormatter();
-                saveFile = new FileStream(buildDataPath, FileMode.Create, FileAccess.Write);
-                serializer.Serialize(saveFile, data);
-                saveFile.Close();
-            }
-            catch (Exception)
-            {
-
-            }
-            finally
-            {
-                if (saveFile != null)
-                    saveFile.Close();
-            }
         }
 
         private void listBoxBuild_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -458,6 +398,7 @@ namespace CensusManager
             //Process.Start("iexplore.exe", url);
 
         }
+
         private void label房屋_Click(object sender, EventArgs e)
         {
             DataForm dataForm = new DataForm();
@@ -489,7 +430,6 @@ namespace CensusManager
 
         }
 
-
         private void listBoxVillage_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             var currentVillage = this.listBoxVillage.SelectedItem as Village;
@@ -500,7 +440,7 @@ namespace CensusManager
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            foreach (var v in allVillageList)
+            foreach (var v in currentVillageList)
             {
                 v.name = v.name.Replace("鲁权屯镇", "");
                 this.listBoxVillage.Items.Add(v);
@@ -519,7 +459,7 @@ namespace CensusManager
             {
                 Stopwatch sw = new Stopwatch();
                 sw.Restart();
-                currentBuildList = allBuildList.Where(model => model.villageGuid.Equals(currentVillage.guid)).ToList();
+                currentBuildList = CensusContext.GetBuilds(currentVillage.guid);
                 sw.Stop();
                 var span = sw.ElapsedMilliseconds;
 
@@ -529,69 +469,6 @@ namespace CensusManager
                 }
             }
         }
-        private List<Village> getVillageList()
-        {
-            FileStream loadFile = null;
-            try
-            {
-                IFormatter serializer = new BinaryFormatter();
-                loadFile = new FileStream(villageDataPath, FileMode.Open, FileAccess.Read);
-                var villageList = serializer.Deserialize(loadFile) as List<Village>;
-                return villageList;
-            }
-            catch (Exception)
-            {
-                return new List<Village>();
-            }
-            finally
-            {
-                if (loadFile != null)
-                    loadFile.Close();
-            }
-        }
-
-        private List<Build> getBuildList()
-        {
-            FileStream loadFile = null;
-            try
-            {
-                IFormatter serializer = new BinaryFormatter();
-                loadFile = new FileStream(buildDataPath, FileMode.Open, FileAccess.Read);
-                var buildList = serializer.Deserialize(loadFile) as List<Build>;
-                return buildList;
-            }
-            catch (Exception)
-            {
-                return new List<Build>();
-            }
-            finally
-            {
-                if (loadFile != null)
-                    loadFile.Close();
-            }
-        }
-
-        private List<Person> getPersonList()
-        {
-            FileStream loadFile = null;
-            try
-            {
-                IFormatter serializer = new BinaryFormatter();
-                loadFile = new FileStream(personDataPath, FileMode.Open, FileAccess.Read);
-                var personList = serializer.Deserialize(loadFile) as List<Person>;
-                return personList;
-            }
-            catch (Exception)
-            {
-                return new List<Person>();
-            }
-            finally
-            {
-                if (loadFile != null)
-                    loadFile.Close();
-            }
-        }
-
         private void listBoxBuild_SelectedIndexChanged(object sender, EventArgs e)
         {
             step = 0;
@@ -602,8 +479,7 @@ namespace CensusManager
 
             if (currentBuild != null)
             {
-                string address = "鲁权屯镇" + currentVillage.name + currentBuild.number;
-                currentPersonList = allPersonList.Where(model => model.address.Equals(address)).ToList();
+                currentPersonList = CensusContext.GetPersons(currentVillage.name, currentBuild.number); 
 
 
                 StringBuilder fun02 = new StringBuilder();
@@ -697,30 +573,11 @@ namespace CensusManager
             }
         }
 
-        //private void CoreWebView2_ContainsFullScreenElementChanged(object sender, object e)
-        //{
-        //    e.ToString();
-        //}
-
-        //private void CoreWebView2_WebMessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs e)
-        //{
-        //    e.ToString();
-        //}
-
-        //private void CoreWebView2_ScriptDialogOpening1(object sender, CoreWebView2ScriptDialogOpeningEventArgs e)
-        //{
-        //    e.Accept();
-        //}
-        private void CoreWebView2_ScriptDialogOpening(object sender, Microsoft.Web.WebView2.Core.CoreWebView2ScriptDialogOpeningEventArgs e)
-        {
-            e.Accept();
-        }
-
         private void listBoxBuild_DragDrop(object sender, DragEventArgs e)
         {
             listBoxBuild.Items.Clear();
             dragFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
-            new Thread(new ThreadStart(parseBuild)).Start();
+            new Thread(new ThreadStart(parseVillage)).Start();
         }
 
         private void listBoxBuild_DragEnter(object sender, DragEventArgs e)
@@ -738,7 +595,7 @@ namespace CensusManager
         private void listBoxVillage_DragDrop(object sender, DragEventArgs e)
         {
             dragFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
-            new Thread(new ThreadStart(parseBuild)).Start();
+            new Thread(new ThreadStart(parseVillage)).Start();
 
         }
 
@@ -934,10 +791,15 @@ namespace CensusManager
             //    MessageBox.Show(html);
             //}
         }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            CensusContext.DisConnect();
+        }
     }
-    class MoveFile
-    {
-        public string oldPath;
-        public string newPath;
-    }
+    //class MoveFile
+    //{
+    //    public string oldPath;
+    //    public string newPath;
+    //}
 }
