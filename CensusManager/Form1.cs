@@ -264,18 +264,19 @@ namespace CensusManager
                 int newVillageCount = 0, newBuildCount = 0, oldVillageCount = 0, oldBuildCount = 0, fileCount = 0;
                 StringBuilder sb = new StringBuilder();
 
-
+                int ic = 0, size = dragFiles.Length;
                 foreach (var dragFile in dragFiles)
                 {
+                    ic++;
                     this.Invoke(new FormControlInvoker(() =>
                     {
-                        statusLabel.Text = dragFile;
+                        statusLabel.Text = $"{dragFile}，{ic}/{size}";
                     }));
                     reader = File.OpenText(dragFile);
                     string content = reader.ReadToEnd();
                     Regex reg = new Regex("[0-9A-Za-z]{8}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{12}");
                     var guidCollection = reg.Matches(content);
-                    reg = new Regex("(?<=dzyslx=.*>).{1,10}(?=</div>)");
+                    reg = new Regex("(?<=dzyslx=[^>]*>)[^<]{1,10}(?=</div>)");
                     //reg = new Regex("(?<=dzyslx=.*>)[^</div>]{1,10}(?=</div>)");
                     var numberCollection = reg.Matches(content);
                     reg = new Regex("(?<=mid=\")[0-9]{21}");
@@ -335,8 +336,6 @@ namespace CensusManager
                         string guid = guidCollection[i + 1].Value.Trim();
                         string mid = midCollection[i].Value.Trim();
                         string number = numberCollection[i].Value.Trim();
-                        if (number.Contains("<"))
-                            number = "-";
                         if (!CensusContext.IsExistBuild(guid))
                         {
                             newBuildCount++;
