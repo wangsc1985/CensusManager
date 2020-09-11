@@ -72,7 +72,6 @@ namespace CensusManager
             this.listBoxVillage.SelectedIndexChanged += new System.EventHandler(this.listBoxVillage_SelectedIndexChanged);
             this.listBoxVillage.DragDrop += new System.Windows.Forms.DragEventHandler(this.listBoxVillage_DragDrop);
             this.listBoxVillage.DragEnter += new System.Windows.Forms.DragEventHandler(this.listBoxVillage_DragEnter);
-            this.listBoxVillage.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listBoxVillage_MouseDoubleClick);
             // 
             // listBoxBuild
             // 
@@ -89,7 +88,6 @@ namespace CensusManager
             this.listBoxBuild.SelectedIndexChanged += new System.EventHandler(this.listBoxBuild_SelectedIndexChanged);
             this.listBoxBuild.DragDrop += new System.Windows.Forms.DragEventHandler(this.listBoxBuild_DragDrop);
             this.listBoxBuild.DragEnter += new System.Windows.Forms.DragEventHandler(this.listBoxBuild_DragEnter);
-            this.listBoxBuild.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listBoxBuild_MouseDoubleClick);
             // 
             // label1
             // 

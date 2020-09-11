@@ -70,15 +70,15 @@ namespace CensusManager
                         {
                             this.Invoke(new FormControlInvoker(() =>
                             {
-                                statusLabel.Text = dragFile + "，" + currentRowIndex + "行";
+                                statusLabel.Text = dragFile + "，" + (currentRowIndex + 1) + "行";
                             }));
                             string no = sheet.Rows[currentRowIndex][0].ToString().Trim();
                             string ralation = sheet.Rows[currentRowIndex][1].ToString().Trim();
                             string name = sheet.Rows[currentRowIndex][2].ToString().Trim();
                             string id = sheet.Rows[currentRowIndex][3].ToString().Trim();
                             string address = sheet.Rows[currentRowIndex][4].ToString().Trim();
-
                             currentRowIndex++;
+
                             if (no.Trim().Length != 9 || id.Trim().Length != 18)
                             {
                                 illegal++;
@@ -286,7 +286,7 @@ namespace CensusManager
                     var villageNameCollection = reg.Matches(content);
 
                     string fileNameEx = Path.GetFileName(dragFile), fileName = Path.GetFileNameWithoutExtension(dragFile);
-                    if (!(numberCollection.Count == midCollection.Count&& midCollection.Count == guidCollection.Count&&villageGuidCollection.Count==1&&villageNameCollection.Count==1))
+                    if (!(numberCollection.Count == midCollection.Count && midCollection.Count == guidCollection.Count && villageGuidCollection.Count == 1 && villageNameCollection.Count == 1))
                     {
                         MessageBox.Show($"file : {fileName};village guid count : {villageGuidCollection.Count} ;village name count : {villageNameCollection.Count} ;guid count : {guidCollection.Count}; number count : {numberCollection.Count} ;mid count : {midCollection.Count} . ");
                         throw new Exception("【" + fileName + "】的房屋数据不平衡。");
@@ -648,15 +648,15 @@ namespace CensusManager
             //string html = HttpHelper.PostHttpByJson(uri, json);
             //MessageBox.Show(html);
 
-            if (!allowClick) return;
-            string mid = (this.listBoxBuild.SelectedItem as Build).mid;
-            string hkwtJson = "{\"hkwt_sg\":\"\",\"hkwt_zy\":\"\",\"hkwt_fwcs\":\"\"}";
-            string person = "[{ \"xm\":\"苏振红\",\"gmsfhm\":\"372424196809183530\",\"ysbrgx\":\"01\",\"rkbm\":\"\"'},{ \"xm\":\"张国英\",\"gmsfhm\":\"372424196602183541\",\"ysbrgx\":\"\",\"rkbm\":\"\"}]";
-            string json = "{ \"ryxx\":\"" + person + "\",\"mid\":\"" + mid + "\",\"wt\":\"" + hkwtJson + "\" }";
-            string uri = "https://msjw.gat.shandong.gov.cn/zayw/hkzd/stbb/jnryxx_save.jsp";
-            string html = HttpHelper.PostHttpByJson(uri, json);
-            File.WriteAllText("d:\\abc.txt", html);
-            MessageBox.Show("访问结束");
+            //if (!allowClick) return;
+            //string mid = (this.listBoxBuild.SelectedItem as Build).mid;
+            //string hkwtJson = "{\"hkwt_sg\":\"\",\"hkwt_zy\":\"\",\"hkwt_fwcs\":\"\"}";
+            //string person = "[{ \"xm\":\"苏振红\",\"gmsfhm\":\"372424196809183530\",\"ysbrgx\":\"01\",\"rkbm\":\"\"'},{ \"xm\":\"张国英\",\"gmsfhm\":\"372424196602183541\",\"ysbrgx\":\"\",\"rkbm\":\"\"}]";
+            //string json = "{ \"ryxx\":\"" + person + "\",\"mid\":\"" + mid + "\",\"wt\":\"" + hkwtJson + "\" }";
+            //string uri = "https://msjw.gat.shandong.gov.cn/zayw/hkzd/stbb/jnryxx_save.jsp";
+            //string html = HttpHelper.PostHttpByJson(uri, json);
+            //File.WriteAllText("d:\\abc.txt", html);
+            //MessageBox.Show("访问结束");
         }
 
         private void dataGridViewPerson_DragDrop(object sender, DragEventArgs e)
