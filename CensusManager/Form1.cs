@@ -680,7 +680,6 @@ namespace CensusManager
             }
         }
 
-        private bool allowClick = false;
 
         private void web_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
         {
