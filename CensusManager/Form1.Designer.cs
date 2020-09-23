@@ -47,8 +47,8 @@ namespace CensusManager
             this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.buttonLoad = new System.Windows.Forms.Button();
-            this.buttonSubmit = new System.Windows.Forms.Button();
+            //this.buttonLoad = new System.Windows.Forms.Button();
+            //this.buttonSubmit = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.web = new Microsoft.Web.WebView2.WinForms.WebView2();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -194,28 +194,28 @@ namespace CensusManager
             this.Column4.Name = "Column4";
             this.Column4.ReadOnly = true;
             this.Column4.Width = 250;
-            // 
-            // buttonLoad
-            // 
-            this.buttonLoad.Font = new System.Drawing.Font("华文中宋", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.buttonLoad.Location = new System.Drawing.Point(459, 239);
-            this.buttonLoad.Name = "buttonLoad";
-            this.buttonLoad.Size = new System.Drawing.Size(125, 33);
-            this.buttonLoad.TabIndex = 7;
-            this.buttonLoad.Text = "提交";
-            this.buttonLoad.UseVisualStyleBackColor = true;
-            this.buttonLoad.Click += new System.EventHandler(this.buttonLoad_Click);
-            // 
-            // buttonSubmit
-            // 
-            this.buttonSubmit.Font = new System.Drawing.Font("华文中宋", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.buttonSubmit.Location = new System.Drawing.Point(459, 239);
-            this.buttonSubmit.Name = "buttonSubmit";
-            this.buttonSubmit.Size = new System.Drawing.Size(125, 33);
-            this.buttonSubmit.TabIndex = 7;
-            this.buttonSubmit.Text = "提交";
-            this.buttonSubmit.UseVisualStyleBackColor = true;
-            this.buttonSubmit.Click += new System.EventHandler(this.buttonSubmit_Click);
+            //// 
+            //// buttonLoad
+            //// 
+            //this.buttonLoad.Font = new System.Drawing.Font("华文中宋", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            //this.buttonLoad.Location = new System.Drawing.Point(459, 239);
+            //this.buttonLoad.Name = "buttonLoad";
+            //this.buttonLoad.Size = new System.Drawing.Size(125, 33);
+            //this.buttonLoad.TabIndex = 7;
+            //this.buttonLoad.Text = "提交";
+            //this.buttonLoad.UseVisualStyleBackColor = true;
+            //this.buttonLoad.Click += new System.EventHandler(this.buttonLoad_Click);
+            //// 
+            //// buttonSubmit
+            //// 
+            //this.buttonSubmit.Font = new System.Drawing.Font("华文中宋", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            //this.buttonSubmit.Location = new System.Drawing.Point(459, 239);
+            //this.buttonSubmit.Name = "buttonSubmit";
+            //this.buttonSubmit.Size = new System.Drawing.Size(125, 33);
+            //this.buttonSubmit.TabIndex = 7;
+            //this.buttonSubmit.Text = "提交";
+            //this.buttonSubmit.UseVisualStyleBackColor = true;
+            //this.buttonSubmit.Click += new System.EventHandler(this.buttonSubmit_Click);
             // 
             // label4
             // 
@@ -299,8 +299,8 @@ namespace CensusManager
         private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column3;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column4;
-        private System.Windows.Forms.Button buttonLoad;
-        private System.Windows.Forms.Button buttonSubmit;
+        //private System.Windows.Forms.Button buttonLoad;
+        //private System.Windows.Forms.Button buttonSubmit;
         private System.Windows.Forms.Label label4;
         private Microsoft.Web.WebView2.WinForms.WebView2 web;
         private System.Windows.Forms.StatusStrip statusStrip1;

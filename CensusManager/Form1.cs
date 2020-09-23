@@ -6,9 +6,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -478,10 +475,16 @@ namespace CensusManager
 
                 StringBuilder fun02 = new StringBuilder();
                 fun02.Append("function fun02() {");
-                fun02.Append("  $('.xshcyxx').remove();");
-                fun02.Append("  $('.hjcyList').remove();");
+
+                // 删除选择同住人div
+                //fun02.Append("  $('.xshcyxx').remove();");
+                //fun02.Append("  $('.hjcyList').remove();");
+
+                // 删除添加同住人div和img按钮
                 fun02.Append("  $(\"[class='sbrTit bbb vvv']\").remove();");
                 fun02.Append("  $(\"[class='addtzrBtn tianjia']\").remove();");
+
+                // 清空所有个人信息
                 fun02.Append("  $('#hkwt_whcd').val('');");
                 fun02.Append("  $('#hkwt_whcd').attr('code', '');");
                 fun02.Append("  $('#hkwt_byzk').val('');");
@@ -494,13 +497,49 @@ namespace CensusManager
                 fun02.Append("  $('#hkwt_zy').val('');");
                 fun02.Append("  $('#hkwt_fwcs').val('');");
                 fun02.Append("}");
-                //fun02.Append("fun02();");
+
+
+
+
+                StringBuilder fun03 = new StringBuilder();
+                fun03.Append("var vv= 0; ");
+                fun03.Append("var tim=0; ");
+                fun03.Append("var i=0;");
+                fun03.Append("function fun03() {");
+                fun03.Append("  $('.hjcyList').bind('DOMNodeInserted', function(){");
+                fun03.Append("      if(i++==0){");
+                fun03.Append("          fun04();");
+                fun03.Append("          getTHR();");
+                fun03.Append("      }");
+                fun03.Append("  });");
+                fun03.Append("}");
+
+
+                StringBuilder fun04 = new StringBuilder();
+                fun04.Append("function fun04() {");
+                fun04.Append("  setTimeout(\"$('#hkwt_sg').val(3143); vv = $('#hkwt_sg').val();\",500 );");
+                fun04.Append("  tim = window.setInterval('aaa()',1000);");
+                fun04.Append("}");
+                				
+                StringBuilder funAAA = new StringBuilder();
+                funAAA.Append("function aaa() {");
+                funAAA.Append("  if ($('#hkwt_sg').val() != vv){");
+                funAAA.Append("  $('.xshcyxx').hide();");
+                funAAA.Append("  $('.hjcyList').hide();");
+                funAAA.Append("      doSubmits();");
+                funAAA.Append("      window.clearInterval(tim);");
+                funAAA.Append("  }");
+                funAAA.Append("}");
+
 
                 StringBuilder fun01 = new StringBuilder();
                 fun01.Append("function fun01() {");
+
+                // 切换是否本人
                 fun01.Append("$('#mySwitch2').removeClass('mui-active');");
                 fun01.Append("$('.mui-switch-handle').attr('style', 'transition-duration: 0.2s; transform: translate(0px, 0px);');");
 
+                // 个人身份证只读去除
                 fun01.Append("$('#pid').attr('readonly', false);");
                 fun01.Append("$('#name').attr('readonly', false);");
 
@@ -540,8 +579,12 @@ namespace CensusManager
                     }
                 }
                 fun01.Append("}");
+
                 web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(fun01.ToString());
-                web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(fun02.ToString());
+                //web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(fun02.ToString());
+                web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(fun03.ToString());
+                web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(funAAA.ToString());
+                web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(fun04.ToString());
                 web.CoreWebView2.Navigate(url);
 
                 //web.CoreWebView2.Settings.AreDefaultScriptDialogsEnabled = true;
@@ -557,13 +600,13 @@ namespace CensusManager
                 dataGridViewCellStyle1.ForeColor = Color.White;
 
 
-                int index1 = this.dataGridViewPerson.Rows.Add();
-                this.dataGridViewPerson.Rows[index1].Cells[0].Value = "";
-                this.dataGridViewPerson.Rows[index1].Cells[1].Value = "";
-                this.dataGridViewPerson.Rows[index1].Cells[2].Value = "同步";
-                this.dataGridViewPerson.Rows[index1].Cells[2].Style = dataGridViewCellStyle1;
-                this.dataGridViewPerson.Rows[index1].Cells[3].Value = "提交";
-                this.dataGridViewPerson.Rows[index1].Cells[3].Style = dataGridViewCellStyle1;
+                //int index1 = this.dataGridViewPerson.Rows.Add();
+                //this.dataGridViewPerson.Rows[index1].Cells[0].Value = "";
+                //this.dataGridViewPerson.Rows[index1].Cells[1].Value = "";
+                //this.dataGridViewPerson.Rows[index1].Cells[2].Value = "同步";
+                //this.dataGridViewPerson.Rows[index1].Cells[2].Style = dataGridViewCellStyle1;
+                //this.dataGridViewPerson.Rows[index1].Cells[3].Value = "提交";
+                //this.dataGridViewPerson.Rows[index1].Cells[3].Style = dataGridViewCellStyle1;
             }
         }
 
@@ -615,8 +658,8 @@ namespace CensusManager
                         //new Thread(new ThreadStart(() =>
                         //{
                         step = 1;
-                        web.CoreWebView2.ExecuteScriptAsync("fun02();");
-                        Thread.Sleep(1000);
+                        //web.CoreWebView2.ExecuteScriptAsync("aaa();");
+                        //Thread.Sleep(1000);
                         web.CoreWebView2.ExecuteScriptAsync("getTHR();");
                         //})).Start();
                         break;
@@ -683,7 +726,9 @@ namespace CensusManager
 
         private void web_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
         {
+            // 网页加载完毕后，执行fun01()
             web.CoreWebView2.ExecuteScriptAsync("fun01();");
+            web.CoreWebView2.ExecuteScriptAsync("fun03();");
         }
 
         //private void aaa()
@@ -705,25 +750,27 @@ namespace CensusManager
         //    }
         //}
 
-        private void buttonSubmit_Click(object sender, EventArgs e)
-        {
-            new Thread(new ThreadStart(() =>
-            {
-                web.CoreWebView2.ExecuteScriptAsync("doSubmits();");
-            })).Start();
-        }
-
-        //private void web_LongRunningScriptDetected(object sender, Microsoft.Toolkit.Win32.UI.Controls.Interop.WinRT.WebViewControlLongRunningScriptDetectedEventArgs e)
+        //private void buttonSubmit_Click(object sender, EventArgs e)
         //{
+        //    new Thread(new ThreadStart(() =>
+        //    {
+        //        // 执行提交方法
+        //        web.CoreWebView2.ExecuteScriptAsync("doSubmits();");
+        //    })).Start();
         //}
 
-        private void buttonLoad_Click(object sender, EventArgs e)
-        {
-            new Thread(new ThreadStart(() =>
-            {
-                web.CoreWebView2.ExecuteScriptAsync("getTHR();");
-            })).Start();
-        }
+        ////private void web_LongRunningScriptDetected(object sender, Microsoft.Toolkit.Win32.UI.Controls.Interop.WinRT.WebViewControlLongRunningScriptDetectedEventArgs e)
+        ////{
+        ////}
+
+        //private void buttonLoad_Click(object sender, EventArgs e)
+        //{
+        //    new Thread(new ThreadStart(() =>
+        //    {
+        //        // 获取当前用户信息
+        //        web.CoreWebView2.ExecuteScriptAsync("getTHR();");
+        //    })).Start();
+        //}
 
         //private void ccc()
         //{
