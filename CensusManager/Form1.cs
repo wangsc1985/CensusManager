@@ -497,7 +497,11 @@ namespace CensusManager
                 funClearInfo.Append("  $('#hkwt_fwcs').val('');");
                 funClearInfo.Append("}");
 
-
+                /**
+                 * 打开网页。设置身高999999，。开始watcher。
+                 * 当身高!=999999并且step=0，说明第一次load数据完毕。执行{step=1，设置身高999999，并且getTHR()}
+                 * 当身高!=999999并且step=1，说明第二次load数据完毕。执行{$('.xshcyxx').hide(); $('.hjcyList').empty(); doSubmits();window.clearInterval(watcherIndex);}
+                 */
 
 
                 StringBuilder fun03 = new StringBuilder();
@@ -510,7 +514,7 @@ namespace CensusManager
                 fun03.Append("      if(insertCount++==0){");
                 if (checkBox1.Checked)
                 {
-                    fun03.Append("      setTimeout('funWatch();',200 );");
+                    fun03.Append("      setTimeout('funWatcher();',200 );");
                     fun03.Append("      getTHR();");
                 }
                 else
@@ -522,15 +526,15 @@ namespace CensusManager
                 fun03.Append("}");
 
 
-                StringBuilder funWatch = new StringBuilder();
-                funWatch.Append("function funWatch() {");
-                funWatch.Append("  $('#hkwt_sg').val(999999); preValue = $('#hkwt_sg').val();");
-                funWatch.Append("  watcherIndex = window.setInterval('aaa()',200);");
-                funWatch.Append("}");
+                StringBuilder funWatcher = new StringBuilder();
+                funWatcher.Append("function funWatcher() {");
+                funWatcher.Append("  $('#hkwt_fwcs').val(999999); preValue = $('#hkwt_fwcs').val();");
+                funWatcher.Append("  watcherIndex = window.setInterval('aaa()',200);");
+                funWatcher.Append("}");
 
                 StringBuilder funAAA = new StringBuilder();
                 funAAA.Append("function aaa() {");
-                funAAA.Append("  if ($('#hkwt_sg').val() != preValue){");
+                funAAA.Append("  if ($('#hkwt_fwcs').val() != preValue){");
                 funAAA.Append("     $('.xshcyxx').hide(); $('.hjcyList').empty();  ");
                 funAAA.Append("      doSubmits();");
                 funAAA.Append("      window.clearInterval(watcherIndex);");
@@ -538,16 +542,16 @@ namespace CensusManager
                 funAAA.Append("}");
 
 
-                StringBuilder funFillData = new StringBuilder();
-                funFillData.Append("function funFillData() {");
+                StringBuilder funInit = new StringBuilder();
+                funInit.Append("function funInit() {");
 
                 // 切换是否本人
-                funFillData.Append("$('#mySwitch2').removeClass('mui-active');");
-                funFillData.Append("$('.mui-switch-handle').attr('style', 'transition-duration: 0.2s; transform: translate(0px, 0px);');");
+                funInit.Append("$('#mySwitch2').removeClass('mui-active');");
+                funInit.Append("$('.mui-switch-handle').attr('style', 'transition-duration: 0.2s; transform: translate(0px, 0px);');");
 
                 // 个人身份证只读去除
-                funFillData.Append("$('#pid').attr('readonly', false);");
-                funFillData.Append("$('#name').attr('readonly', false);");
+                funInit.Append("$('#pid').attr('readonly', false);");
+                funInit.Append("$('#name').attr('readonly', false);");
 
 
 
@@ -571,26 +575,26 @@ namespace CensusManager
                         this.dataGridViewPerson.Rows[index].Cells[2].Style = cs;
                         this.dataGridViewPerson.Rows[index].Cells[3].Style = cs;
 
-                        funFillData.Append($"$('#pid').val('{b.id}');");
-                        funFillData.Append($"$('#name').val('{b.name}');");
+                        funInit.Append($"$('#pid').val('{b.id}');");
+                        funInit.Append($"$('#name').val('{b.name}');");
                         //builder.Append($"$('#info').trigger('blur');");
                     }
                     else
                     {
                         //builder.Append("if($('.addBox').size()>0) return;");
-                        funFillData.Append("$('.tianjia').trigger('tap');");
-                        funFillData.Append($" $('.addBox').eq({i}).find('.tzrPid').first().val('{b.id}');");
-                        funFillData.Append($" $('.addBox').eq({i}).find('.tzrName').first().val('{b.name}');");
+                        funInit.Append("$('.tianjia').trigger('tap');");
+                        funInit.Append($" $('.addBox').eq({i}).find('.tzrPid').first().val('{b.id}');");
+                        funInit.Append($" $('.addBox').eq({i}).find('.tzrName').first().val('{b.name}');");
                         i++;
                     }
                 }
-                funFillData.Append("}");
+                funInit.Append("}");
 
-                web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(funFillData.ToString());
+                web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(funInit.ToString());
                 web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(funClearInfo.ToString());
                 web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(fun03.ToString());
                 web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(funAAA.ToString());
-                web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(funWatch.ToString());
+                web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(funWatcher.ToString());
                 web.CoreWebView2.Navigate(url);
 
                 //web.CoreWebView2.Settings.AreDefaultScriptDialogsEnabled = true;
@@ -732,8 +736,8 @@ namespace CensusManager
 
         private void web_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
         {
-            // 网页加载完毕后，执行funFillData()
-            web.CoreWebView2.ExecuteScriptAsync("funFillData();");
+            // 网页加载完毕后，执行funInit()
+            web.CoreWebView2.ExecuteScriptAsync("funInit();");
             web.CoreWebView2.ExecuteScriptAsync("fun03();");
 
         }
