@@ -47,12 +47,11 @@ namespace CensusManager
             this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            //this.buttonLoad = new System.Windows.Forms.Button();
-            //this.buttonSubmit = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.web = new Microsoft.Web.WebView2.WinForms.WebView2();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewPerson)).BeginInit();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -194,28 +193,6 @@ namespace CensusManager
             this.Column4.Name = "Column4";
             this.Column4.ReadOnly = true;
             this.Column4.Width = 250;
-            //// 
-            //// buttonLoad
-            //// 
-            //this.buttonLoad.Font = new System.Drawing.Font("华文中宋", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            //this.buttonLoad.Location = new System.Drawing.Point(459, 239);
-            //this.buttonLoad.Name = "buttonLoad";
-            //this.buttonLoad.Size = new System.Drawing.Size(125, 33);
-            //this.buttonLoad.TabIndex = 7;
-            //this.buttonLoad.Text = "提交";
-            //this.buttonLoad.UseVisualStyleBackColor = true;
-            //this.buttonLoad.Click += new System.EventHandler(this.buttonLoad_Click);
-            //// 
-            //// buttonSubmit
-            //// 
-            //this.buttonSubmit.Font = new System.Drawing.Font("华文中宋", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            //this.buttonSubmit.Location = new System.Drawing.Point(459, 239);
-            //this.buttonSubmit.Name = "buttonSubmit";
-            //this.buttonSubmit.Size = new System.Drawing.Size(125, 33);
-            //this.buttonSubmit.TabIndex = 7;
-            //this.buttonSubmit.Text = "提交";
-            //this.buttonSubmit.UseVisualStyleBackColor = true;
-            //this.buttonSubmit.Click += new System.EventHandler(this.buttonSubmit_Click);
             // 
             // label4
             // 
@@ -258,12 +235,27 @@ namespace CensusManager
             this.statusLabel.Size = new System.Drawing.Size(28, 17);
             this.statusLabel.Text = "     ";
             // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Checked = true;
+            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox1.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.checkBox1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this.checkBox1.Location = new System.Drawing.Point(1010, 12);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(112, 23);
+            this.checkBox1.TabIndex = 9;
+            this.checkBox1.Text = "自动同步数据";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1407, 861);
+            this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.web);
             this.Controls.Add(this.dataGridViewPerson);
@@ -305,6 +297,7 @@ namespace CensusManager
         private Microsoft.Web.WebView2.WinForms.WebView2 web;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel statusLabel;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }
 

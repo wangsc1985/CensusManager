@@ -473,30 +473,29 @@ namespace CensusManager
                 currentPersonList = CensusContext.GetPersons(currentVillage.name, currentBuild.number);
 
 
-                StringBuilder fun02 = new StringBuilder();
-                fun02.Append("function fun02() {");
+                StringBuilder funClearInfo = new StringBuilder();
+                funClearInfo.Append("function funClearInfo() {");
 
                 // 删除选择同住人div
-                //fun02.Append("  $('.xshcyxx').remove();");
-                //fun02.Append("  $('.hjcyList').remove();");
+                funClearInfo.Append("  $('.xshcyxx').hide(); $('.hjcyList').empty();");
 
                 // 删除添加同住人div和img按钮
-                fun02.Append("  $(\"[class='sbrTit bbb vvv']\").remove();");
-                fun02.Append("  $(\"[class='addtzrBtn tianjia']\").remove();");
+                funClearInfo.Append("  $(\"[class='sbrTit bbb vvv']\").remove();");
+                funClearInfo.Append("  $(\"[class='addtzrBtn tianjia']\").remove();");
 
                 // 清空所有个人信息
-                fun02.Append("  $('#hkwt_whcd').val('');");
-                fun02.Append("  $('#hkwt_whcd').attr('code', '');");
-                fun02.Append("  $('#hkwt_byzk').val('');");
-                fun02.Append("  $('#hkwt_byzk').attr('code', '');");
-                fun02.Append("  $('#hkwt_hyzk').val('');");
-                fun02.Append("  $('#hkwt_hyzk').attr('code', '');");
-                fun02.Append("  $('#hkwt_xx').val('');");
-                fun02.Append("  $('#hkwt_xx').attr('code', '');");
-                fun02.Append("  $('#hkwt_sg').val('');");
-                fun02.Append("  $('#hkwt_zy').val('');");
-                fun02.Append("  $('#hkwt_fwcs').val('');");
-                fun02.Append("}");
+                funClearInfo.Append("  $('#hkwt_whcd').val('');");
+                funClearInfo.Append("  $('#hkwt_whcd').attr('code', '');");
+                funClearInfo.Append("  $('#hkwt_byzk').val('');");
+                funClearInfo.Append("  $('#hkwt_byzk').attr('code', '');");
+                funClearInfo.Append("  $('#hkwt_hyzk').val('');");
+                funClearInfo.Append("  $('#hkwt_hyzk').attr('code', '');");
+                funClearInfo.Append("  $('#hkwt_xx').val('');");
+                funClearInfo.Append("  $('#hkwt_xx').attr('code', '');");
+                funClearInfo.Append("  $('#hkwt_sg').val('');");
+                funClearInfo.Append("  $('#hkwt_zy').val('');");
+                funClearInfo.Append("  $('#hkwt_fwcs').val('');");
+                funClearInfo.Append("}");
 
 
 
@@ -508,40 +507,46 @@ namespace CensusManager
                 fun03.Append("function fun03() {");
                 fun03.Append("  $('.hjcyList').bind('DOMNodeInserted', function(){");
                 fun03.Append("      if(i++==0){");
-                fun03.Append("          fun04();");
-                fun03.Append("          getTHR();");
+                if (checkBox1.Checked)
+                {
+                    fun03.Append("      setTimeout('funWatch();',100 );");
+                    fun03.Append("      getTHR();");
+                }
+                else
+                {
+                    fun03.Append("      setTimeout('funClearInfo(); doSubmits()',100);");
+                }
                 fun03.Append("      }");
                 fun03.Append("  });");
                 fun03.Append("}");
 
 
-                StringBuilder fun04 = new StringBuilder();
-                fun04.Append("function fun04() {");
-                fun04.Append("  setTimeout(\"$('#hkwt_sg').val(3143); vv = $('#hkwt_sg').val();\",500 );");
-                fun04.Append("  tim = window.setInterval('aaa()',1000);");
-                fun04.Append("}");
-                				
+                StringBuilder funWatch = new StringBuilder();
+                funWatch.Append("function funWatch() {");
+                funWatch.Append("  $('#hkwt_sg').val(999999); vv = $('#hkwt_sg').val();");
+                funWatch.Append("  tim = window.setInterval('aaa()',500);");
+                funWatch.Append("}");
+
                 StringBuilder funAAA = new StringBuilder();
                 funAAA.Append("function aaa() {");
                 funAAA.Append("  if ($('#hkwt_sg').val() != vv){");
-                funAAA.Append("  $('.xshcyxx').hide();");
-                funAAA.Append("  $('.hjcyList').hide();");
-                funAAA.Append("      doSubmits();");
+                funAAA.Append("     $('.xshcyxx').hide(); $('.hjcyList').empty();  ");
+                //funAAA.Append("      doSubmits();");
                 funAAA.Append("      window.clearInterval(tim);");
                 funAAA.Append("  }");
                 funAAA.Append("}");
 
 
-                StringBuilder fun01 = new StringBuilder();
-                fun01.Append("function fun01() {");
+                StringBuilder funFillData = new StringBuilder();
+                funFillData.Append("function funFillData() {");
 
                 // 切换是否本人
-                fun01.Append("$('#mySwitch2').removeClass('mui-active');");
-                fun01.Append("$('.mui-switch-handle').attr('style', 'transition-duration: 0.2s; transform: translate(0px, 0px);');");
+                funFillData.Append("$('#mySwitch2').removeClass('mui-active');");
+                funFillData.Append("$('.mui-switch-handle').attr('style', 'transition-duration: 0.2s; transform: translate(0px, 0px);');");
 
                 // 个人身份证只读去除
-                fun01.Append("$('#pid').attr('readonly', false);");
-                fun01.Append("$('#name').attr('readonly', false);");
+                funFillData.Append("$('#pid').attr('readonly', false);");
+                funFillData.Append("$('#name').attr('readonly', false);");
 
 
 
@@ -565,26 +570,26 @@ namespace CensusManager
                         this.dataGridViewPerson.Rows[index].Cells[2].Style = cs;
                         this.dataGridViewPerson.Rows[index].Cells[3].Style = cs;
 
-                        fun01.Append($"$('#pid').val('{b.id}');");
-                        fun01.Append($"$('#name').val('{b.name}');");
+                        funFillData.Append($"$('#pid').val('{b.id}');");
+                        funFillData.Append($"$('#name').val('{b.name}');");
                         //builder.Append($"$('#info').trigger('blur');");
                     }
                     else
                     {
                         //builder.Append("if($('.addBox').size()>0) return;");
-                        fun01.Append("$('.tianjia').trigger('tap');");
-                        fun01.Append($" $('.addBox').eq({i}).find('.tzrPid').first().val('{b.id}');");
-                        fun01.Append($" $('.addBox').eq({i}).find('.tzrName').first().val('{b.name}');");
+                        funFillData.Append("$('.tianjia').trigger('tap');");
+                        funFillData.Append($" $('.addBox').eq({i}).find('.tzrPid').first().val('{b.id}');");
+                        funFillData.Append($" $('.addBox').eq({i}).find('.tzrName').first().val('{b.name}');");
                         i++;
                     }
                 }
-                fun01.Append("}");
+                funFillData.Append("}");
 
-                web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(fun01.ToString());
-                //web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(fun02.ToString());
+                web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(funFillData.ToString());
+                web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(funClearInfo.ToString());
                 web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(fun03.ToString());
                 web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(funAAA.ToString());
-                web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(fun04.ToString());
+                web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(funWatch.ToString());
                 web.CoreWebView2.Navigate(url);
 
                 //web.CoreWebView2.Settings.AreDefaultScriptDialogsEnabled = true;
@@ -726,9 +731,10 @@ namespace CensusManager
 
         private void web_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
         {
-            // 网页加载完毕后，执行fun01()
-            web.CoreWebView2.ExecuteScriptAsync("fun01();");
+            // 网页加载完毕后，执行funFillData()
+            web.CoreWebView2.ExecuteScriptAsync("funFillData();");
             web.CoreWebView2.ExecuteScriptAsync("fun03();");
+
         }
 
         //private void aaa()
