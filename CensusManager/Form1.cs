@@ -501,20 +501,21 @@ namespace CensusManager
 
 
                 StringBuilder fun03 = new StringBuilder();
-                fun03.Append("var vv= 0; ");
-                fun03.Append("var tim=0; ");
-                fun03.Append("var i=0;");
+                fun03.Append("var preValue= 0; ");
+                fun03.Append("var watcherIndex=0; ");
+                fun03.Append("var step=0; ");
+                fun03.Append("var insertCount=0;");
                 fun03.Append("function fun03() {");
                 fun03.Append("  $('.hjcyList').bind('DOMNodeInserted', function(){");
-                fun03.Append("      if(i++==0){");
+                fun03.Append("      if(insertCount++==0){");
                 if (checkBox1.Checked)
                 {
-                    fun03.Append("      setTimeout('funWatch();',100 );");
+                    fun03.Append("      setTimeout('funWatch();',200 );");
                     fun03.Append("      getTHR();");
                 }
                 else
                 {
-                    fun03.Append("      setTimeout('funClearInfo(); doSubmits()',100);");
+                    fun03.Append("      setTimeout('funClearInfo(); doSubmits()',200);");
                 }
                 fun03.Append("      }");
                 fun03.Append("  });");
@@ -523,16 +524,16 @@ namespace CensusManager
 
                 StringBuilder funWatch = new StringBuilder();
                 funWatch.Append("function funWatch() {");
-                funWatch.Append("  $('#hkwt_sg').val(999999); vv = $('#hkwt_sg').val();");
-                funWatch.Append("  tim = window.setInterval('aaa()',500);");
+                funWatch.Append("  $('#hkwt_sg').val(999999); preValue = $('#hkwt_sg').val();");
+                funWatch.Append("  watcherIndex = window.setInterval('aaa()',200);");
                 funWatch.Append("}");
 
                 StringBuilder funAAA = new StringBuilder();
                 funAAA.Append("function aaa() {");
-                funAAA.Append("  if ($('#hkwt_sg').val() != vv){");
+                funAAA.Append("  if ($('#hkwt_sg').val() != preValue){");
                 funAAA.Append("     $('.xshcyxx').hide(); $('.hjcyList').empty();  ");
-                //funAAA.Append("      doSubmits();");
-                funAAA.Append("      window.clearInterval(tim);");
+                funAAA.Append("      doSubmits();");
+                funAAA.Append("      window.clearInterval(watcherIndex);");
                 funAAA.Append("  }");
                 funAAA.Append("}");
 
