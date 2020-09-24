@@ -504,40 +504,52 @@ namespace CensusManager
                  */
 
 
-                StringBuilder fun03 = new StringBuilder();
-                fun03.Append("var preValue= 0; ");
-                fun03.Append("var watcherIndex=0; ");
-                fun03.Append("var step=0; ");
-                fun03.Append("var insertCount=0;");
-                fun03.Append("function fun03() {");
-                fun03.Append("  $('.hjcyList').bind('DOMNodeInserted', function(){");
-                fun03.Append("      if(insertCount++==0){");
-                if (checkBox1.Checked)
-                {
-                    fun03.Append("      setTimeout('funWatcher();',200 );");
-                    fun03.Append("      getTHR();");
-                }
-                else
-                {
-                    fun03.Append("      setTimeout('funClearInfo(); doSubmits()',200);");
-                }
-                fun03.Append("      }");
-                fun03.Append("  });");
-                fun03.Append("}");
+                //StringBuilder fun03 = new StringBuilder();
+                //fun03.Append("function fun03() {");
+                //fun03.Append("  $('.hjcyList').bind('DOMNodeInserted', function(){");
+                //fun03.Append("      if(insertCount++==0){");
+                //if (checkBox1.Checked)
+                //{
+                //    fun03.Append("      setTimeout('funWatcher();',200 );");
+                //    fun03.Append("      getTHR();");
+                //}
+                //else
+                //{
+                //    fun03.Append("      setTimeout('funClearInfo(); doSubmits()',200);");
+                //}
+                //fun03.Append("      }");
+                //fun03.Append("  });");
+                //fun03.Append("}");
 
 
                 StringBuilder funWatcher = new StringBuilder();
+                funWatcher.Append("var watcherIndex=0; ");
+                funWatcher.Append("var step=0; ");
+                funWatcher.Append("var insertCount=0;");
                 funWatcher.Append("function funWatcher() {");
-                funWatcher.Append("  $('#hkwt_fwcs').val(999999); preValue = $('#hkwt_fwcs').val();");
+                funWatcher.Append("  $('#hkwt_fwcs').val(999999);");
                 funWatcher.Append("  watcherIndex = window.setInterval('aaa()',200);");
                 funWatcher.Append("}");
 
                 StringBuilder funAAA = new StringBuilder();
                 funAAA.Append("function aaa() {");
-                funAAA.Append("  if ($('#hkwt_fwcs').val() != preValue){");
-                funAAA.Append("     $('.xshcyxx').hide(); $('.hjcyList').empty();  ");
-                funAAA.Append("      doSubmits();");
-                funAAA.Append("      window.clearInterval(watcherIndex);");
+                funAAA.Append("  if ($('#hkwt_fwcs').val() != 999999){");
+                funAAA.Append("      if(step==0){");
+                if (checkBox1.Checked)
+                {
+                    funAAA.Append("         step=1; $('#hkwt_fwcs').val(999999); getTHR();");
+                    funAAA.Append("      }else if(step=1){");
+                    funAAA.Append("         $('.xshcyxx').hide(); $('.hjcyList').empty();  ");
+                    funAAA.Append("         doSubmits();");
+                    funAAA.Append("         window.clearInterval(watcherIndex);");
+                }
+                else
+                {
+                    funAAA.Append("         funClearInfo();");
+                    funAAA.Append("         doSubmits();");
+                    funAAA.Append("         window.clearInterval(watcherIndex);");
+                }
+                funAAA.Append("      }");
                 funAAA.Append("  }");
                 funAAA.Append("}");
 
@@ -592,7 +604,7 @@ namespace CensusManager
 
                 web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(funInit.ToString());
                 web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(funClearInfo.ToString());
-                web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(fun03.ToString());
+                //web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(fun03.ToString());
                 web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(funAAA.ToString());
                 web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(funWatcher.ToString());
                 web.CoreWebView2.Navigate(url);
@@ -738,7 +750,7 @@ namespace CensusManager
         {
             // 网页加载完毕后，执行funInit()
             web.CoreWebView2.ExecuteScriptAsync("funInit();");
-            web.CoreWebView2.ExecuteScriptAsync("fun03();");
+            web.CoreWebView2.ExecuteScriptAsync("funWatcher();");
 
         }
 
