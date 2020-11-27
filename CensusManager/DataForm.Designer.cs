@@ -64,7 +64,7 @@
             this.Controls.Add(this.listBox1);
             this.Controls.Add(this.webView);
             this.Name = "DataForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "数据";
             this.Load += new System.EventHandler(this.DataForm_Load);
             this.ResumeLayout(false);

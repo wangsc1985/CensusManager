@@ -392,8 +392,6 @@ namespace CensusManager
 
         private void label房屋_Click(object sender, EventArgs e)
         {
-            DataForm dataForm = new DataForm();
-            dataForm.Show();
         }
 
         private void label住户_Click(object sender, EventArgs e)
@@ -460,6 +458,17 @@ namespace CensusManager
                 }
             }
         }
+
+        private void web_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
+        {
+            // 网页加载完毕后，执行funInit()
+            web.CoreWebView2.ExecuteScriptAsync("funInit();");
+            //web.CoreWebView2.ExecuteScriptAsync("funWatcher();");
+            web.CoreWebView2.ExecuteScriptAsync("funClearInfo();");
+            web.CoreWebView2.ExecuteScriptAsync("doSubmits();");
+
+        }
+
         private void listBoxBuild_SelectedIndexChanged(object sender, EventArgs e)
         {
             step = 0;
@@ -471,7 +480,8 @@ namespace CensusManager
             if (currentBuild != null)
             {
                 currentPersonList = CensusContext.GetPersons(currentVillage.name, currentBuild.number);
-
+                if (currentPersonList.Count <= 0)
+                    return;
 
                 StringBuilder funClearInfo = new StringBuilder();
                 funClearInfo.Append("function funClearInfo() {");
@@ -503,25 +513,6 @@ namespace CensusManager
                  * 当身高!=999999并且step=1，说明第二次load数据完毕。执行{$('.xshcyxx').hide(); $('.hjcyList').empty(); doSubmits();window.clearInterval(watcherIndex);}
                  */
 
-
-                //StringBuilder fun03 = new StringBuilder();
-                //fun03.Append("function fun03() {");
-                //fun03.Append("  $('.hjcyList').bind('DOMNodeInserted', function(){");
-                //fun03.Append("      if(insertCount++==0){");
-                //if (checkBox1.Checked)
-                //{
-                //    fun03.Append("      setTimeout('funWatcher();',200 );");
-                //    fun03.Append("      getTHR();");
-                //}
-                //else
-                //{
-                //    fun03.Append("      setTimeout('funClearInfo(); doSubmits()',200);");
-                //}
-                //fun03.Append("      }");
-                //fun03.Append("  });");
-                //fun03.Append("}");
-
-
                 StringBuilder funWatcher = new StringBuilder();
                 funWatcher.Append("var watcherIndex=0; ");
                 funWatcher.Append("var step=0; ");
@@ -542,6 +533,7 @@ namespace CensusManager
                     funAAA.Append("         $('.xshcyxx').hide(); $('.hjcyList').empty();  ");
                     funAAA.Append("         doSubmits();");
                     funAAA.Append("         window.clearInterval(watcherIndex);");
+                    //funAAA.Append("         window.postMessage('aaaa');");
                 }
                 else
                 {
@@ -589,11 +581,9 @@ namespace CensusManager
 
                         funInit.Append($"$('#pid').val('{b.id}');");
                         funInit.Append($"$('#name').val('{b.name}');");
-                        //builder.Append($"$('#info').trigger('blur');");
                     }
                     else
                     {
-                        //builder.Append("if($('.addBox').size()>0) return;");
                         funInit.Append("$('.tianjia').trigger('tap');");
                         funInit.Append($" $('.addBox').eq({i}).find('.tzrPid').first().val('{b.id}');");
                         funInit.Append($" $('.addBox').eq({i}).find('.tzrName').first().val('{b.name}');");
@@ -604,32 +594,22 @@ namespace CensusManager
 
                 web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(funInit.ToString());
                 web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(funClearInfo.ToString());
-                //web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(fun03.ToString());
-                web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(funAAA.ToString());
-                web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(funWatcher.ToString());
+                //web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(funAAA.ToString());
+                //web.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(funWatcher.ToString());
                 web.CoreWebView2.Navigate(url);
 
-                //web.CoreWebView2.Settings.AreDefaultScriptDialogsEnabled = true;
-                //web.CoreWebView2.Settings.IsWebMessageEnabled = true;
+                web.CoreWebView2.Settings.IsWebMessageEnabled = true;
+                web.CoreWebView2.WebMessageReceived += CoreWebView2_WebMessageReceived;
                 //web.CoreWebView2.ScriptDialogOpening += CoreWebView2_ScriptDialogOpening1;
-                //web.CoreWebView2.WebMessageReceived += CoreWebView2_WebMessageReceived;
                 //web.CoreWebView2.ContainsFullScreenElementChanged += CoreWebView2_ContainsFullScreenElementChanged;
 
-                System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-                dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-                dataGridViewCellStyle1.Font = new System.Drawing.Font("微软雅黑", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-                dataGridViewCellStyle1.BackColor = Color.DarkRed;
-                dataGridViewCellStyle1.ForeColor = Color.White;
-
-
-                //int index1 = this.dataGridViewPerson.Rows.Add();
-                //this.dataGridViewPerson.Rows[index1].Cells[0].Value = "";
-                //this.dataGridViewPerson.Rows[index1].Cells[1].Value = "";
-                //this.dataGridViewPerson.Rows[index1].Cells[2].Value = "同步";
-                //this.dataGridViewPerson.Rows[index1].Cells[2].Style = dataGridViewCellStyle1;
-                //this.dataGridViewPerson.Rows[index1].Cells[3].Value = "提交";
-                //this.dataGridViewPerson.Rows[index1].Cells[3].Style = dataGridViewCellStyle1;
             }
+        }
+
+        private void CoreWebView2_WebMessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs e)
+        {
+            MessageBox.Show("aaaaa");
+            int a = 0;
         }
 
         private void listBoxBuild_DragDrop(object sender, DragEventArgs e)
@@ -706,22 +686,6 @@ namespace CensusManager
 
         private void dataGridViewPerson_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            //MessageBox.Show(HttpHelper.PostHttpByUrl("https://localhost:44342/Home/Ask", "name='wangsc'&age=18"));
-
-            //string json = "{'pid':'" + dataGridViewPerson[2, e.RowIndex].Value + "','name':'" + dataGridViewPerson[1, e.RowIndex].Value + "'}";
-            //string uri = "https://msjw.gat.shandong.gov.cn/zayw/hkzd/stbb/cxthr.jsp";
-            //string html = HttpHelper.PostHttpByJson(uri, json);
-            //MessageBox.Show(html);
-
-            //if (!allowClick) return;
-            //string mid = (this.listBoxBuild.SelectedItem as Build).mid;
-            //string hkwtJson = "{\"hkwt_sg\":\"\",\"hkwt_zy\":\"\",\"hkwt_fwcs\":\"\"}";
-            //string person = "[{ \"xm\":\"苏振红\",\"gmsfhm\":\"372424196809183530\",\"ysbrgx\":\"01\",\"rkbm\":\"\"'},{ \"xm\":\"张国英\",\"gmsfhm\":\"372424196602183541\",\"ysbrgx\":\"\",\"rkbm\":\"\"}]";
-            //string json = "{ \"ryxx\":\"" + person + "\",\"mid\":\"" + mid + "\",\"wt\":\"" + hkwtJson + "\" }";
-            //string uri = "https://msjw.gat.shandong.gov.cn/zayw/hkzd/stbb/jnryxx_save.jsp";
-            //string html = HttpHelper.PostHttpByJson(uri, json);
-            //File.WriteAllText("d:\\abc.txt", html);
-            //MessageBox.Show("访问结束");
         }
 
         private void dataGridViewPerson_DragDrop(object sender, DragEventArgs e)
@@ -746,118 +710,15 @@ namespace CensusManager
         }
 
 
-        private void web_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
-        {
-            // 网页加载完毕后，执行funInit()
-            web.CoreWebView2.ExecuteScriptAsync("funInit();");
-            web.CoreWebView2.ExecuteScriptAsync("funWatcher();");
-
-        }
-
-        //private void aaa()
-        //{
-
-        //    SHDocVw.ShellWindows shellWindows = new SHDocVw.ShellWindowsClass();
-        //    //遍历所有选项卡
-        //    foreach (SHDocVw.InternetExplorer Browser in shellWindows)
-        //    {
-        //        if (Browser.LocationURL.Contains("www.baidu.com"))
-        //        {
-        //            IHTMLDocument2 doc2 = (IHTMLDocument2)Browser.Document;
-        //            IHTMLElementCollection inputs = (IHTMLElementCollection)doc2.all.tags("INPUT");
-        //            HTMLInputElement input1 = (HTMLInputElement)inputs.item("kw", 0);
-        //            input1.value = "刘德华";
-        //            IHTMLElement element2 = (IHTMLElement)inputs.item("su", 0);
-        //            element2.click();
-        //        }
-        //    }
-        //}
-
-        //private void buttonSubmit_Click(object sender, EventArgs e)
-        //{
-        //    new Thread(new ThreadStart(() =>
-        //    {
-        //        // 执行提交方法
-        //        web.CoreWebView2.ExecuteScriptAsync("doSubmits();");
-        //    })).Start();
-        //}
-
-        ////private void web_LongRunningScriptDetected(object sender, Microsoft.Toolkit.Win32.UI.Controls.Interop.WinRT.WebViewControlLongRunningScriptDetectedEventArgs e)
-        ////{
-        ////}
-
-        //private void buttonLoad_Click(object sender, EventArgs e)
-        //{
-        //    new Thread(new ThreadStart(() =>
-        //    {
-        //        // 获取当前用户信息
-        //        web.CoreWebView2.ExecuteScriptAsync("getTHR();");
-        //    })).Start();
-        //}
-
-        //private void ccc()
-        //{
-        //    SHDocVw.ShellWindows shellWindows = new SHDocVw.ShellWindowsClass();
-        //    //遍历所有选项卡
-        //    foreach (SHDocVw.InternetExplorer Browser in shellWindows)
-        //    {
-        //        if (Browser.LocationURL.Contains(url))
-        //        {
-        //            IHTMLDocument2 doc2 = (IHTMLDocument2)Browser.Document;
-        //            IHTMLElementCollection divs = (IHTMLElementCollection)doc2.all.tags("input");
-        //            HTMLInputElement aa = (HTMLInputElement)divs.item("pid", 0);
-        //            aa.value = "1234567890";
-        //            //aa.click();
-        //            HTMLInputElement bb = (HTMLInputElement)divs.item("name", 0);
-        //            bb.value = "ddd";
-        //            //bb.click();
-        //        }
-        //    }
-        //}
-
-        private void http()
-        {
-
-            /**
-             * 用自己的服务器测试json参数方法能否发送成功
-             */
-            //string json = "{'name':'wang shi chao'}";
-            //string uri = "https://localhost:44342/Home/Json";
-            //string html = HttpHelper.PostHttpByJson(uri, json);
-
-            /**
-             * 人员申报post
-             */
-            //人员申报json格式：data: { "ryxx":JSON.stringify(list),"mid":mid,"wt":{ } },
-            //rysb json格式：[{ "xm":"王世起","gmsfhm":"371428198412174015","ysbrgx":"01","rkbm":""},{ "xm":"张三","gmsfhm":"123456789123456","ysbrgx":"","rkbm":""}]
-            //wt json格式：{ "hkwt_whcd":"20","hkwt_hyzk":"20","hkwt_sg":"","hkwt_zy":"","hkwt_fwcs":""}
-
-
-            /**
-             * 登录山东微警务
-             */
-            //string json = "{\"loginname\": \"18509513143\", \"password\": \"wjw123321\", \"code\": \"\", \"formerurl\": \"https://msjw.gat.shandong.gov.cn/wechat/html/juzhuzhengnew.html?v=2.0\", \"webtype\": \"\" }";
-            ////string json = "loginname=18509513143&assword=wjw123321&code=''&formerurl=https://msjw.gat.shandong.gov.cn/wechat/html/juzhuzhengnew.html?v=2.0&webtype=''";
-            //string url = "https://msjw.gat.shandong.gov.cn//wechatservice/wxlogin/login";
-            ////string html = HttpHelper.PostHttpByUrl(url, json);
-            //string html = HttpHelper.PostHttpByJson(url, json);
-
-
-
-            //if (html.Length > 1000)
-            //{
-            //    File.WriteAllText("d:\\aaa.txt", html);
-            //    MessageBox.Show("访问结束，d:\\aaa.txt");
-            //}
-            //else
-            //{
-            //    MessageBox.Show(html);
-            //}
-        }
-
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             CensusContext.DisConnect();
+        }
+
+        private void label2_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            DataForm dataForm = new DataForm();
+            dataForm.Show();
         }
     }
     class MoveFile
